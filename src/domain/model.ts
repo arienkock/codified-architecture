@@ -1,8 +1,3 @@
-import * as z from "zod";
- 
-const User = z.object({
-  name: z.string(),
-});
+import { UserModelSchema } from "../generated/zod/schemas";
 
-type User = z.infer<typeof User>;
 

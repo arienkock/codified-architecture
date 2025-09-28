@@ -1,21 +1,24 @@
 {
   "name": "codified-architecture",
-  "type": "module",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "codegen": "prisma generate"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^6.16.2",
+    "express": "^5.1.0",
     "typescript": "^5.9.2",
     "zod": "^4.1.11"
   },
   "devDependencies": {
     "@types/node": "^24.5.2",
-    "prisma": "^6.16.2"
+    "prisma": "^6.16.2",
+    "prisma-zod-generator": "^1.22.2"
   }
 }
