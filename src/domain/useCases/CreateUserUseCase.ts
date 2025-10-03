@@ -1,21 +1,17 @@
-import { UseCase, RequestContext, ValidationResults } from "./types";
-import { UserCreateInputObjectSchema, UserResultType } from "../../generated/zod/schemas";
-import { Prisma } from "../../generated/prisma";
+import { UseCase, RequestContext, ValidationResults, UseCaseResponse } from "./types";
+
+import { UserCreateRequest, UserCreateResponse } from "../../domain-seam/types";
 
 
-type UserCreateRequest = Prisma.UserUncheckedCreateInput
 
-export const CreateUserUseCase: UseCase<UserCreateRequest, UserResultType> = {
-    validateRequest: function (rc: RequestContext, cur: UserCreateRequest): ValidationResults {
-        return ValidationResults.OK
+export const CreateUserUseCase: UseCase<UserCreateRequest, UserCreateResponse> = {
+    parseAndValidateRequest: function (rc: RequestContext, data: any): [ValidationResults, UserCreateRequest] {
+        throw new Error("Function not implemented.");
     },
     isAuthorized: function (rc: RequestContext, cur: UserCreateRequest): boolean {
-        return true
+        throw new Error("Function not implemented.");
     },
-    parseRequest: function (data: any): UserCreateRequest {
-        return UserCreateInputObjectSchema.parse(data)
-    },
-    execute: function (rc: RequestContext, cur: UserCreateRequest): UserResultType {
+    execute: function (rc: RequestContext, cur: UserCreateRequest): UseCaseResponse<{ id: number; email: string; name: string | null; hashedPassword: string; }> {
         throw new Error("Function not implemented.");
     }
 };

@@ -15,10 +15,23 @@ export class ValidationResults {
 
 ValidationResults.OK = new ValidationResults(true)
 
+export interface PaginationMetadata {
+    total: number,
+    page: number,
+    pageSize: number
+}
+
+export interface UseCaseResponse<T> {
+    meta?: {
+        pagination?: PaginationMetadata,
+        warnings?: any[]
+    },
+    data: T,
+}
+
 export interface UseCase<Req, Res>  {
-    validateRequest(rc: RequestContext, cur: Req): ValidationResults
+    parseAndValidateRequest(rc: RequestContext, data: any): [ValidationResults, Req]
     isAuthorized(rc: RequestContext, cur: Req): boolean
-    parseRequest(data: any): Req
-    execute(rc: RequestContext, cur: Req): Res
+    execute(rc: RequestContext, cur: Req): UseCaseResponse<Res>
 }
 
