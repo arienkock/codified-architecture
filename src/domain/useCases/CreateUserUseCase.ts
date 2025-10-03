@@ -15,3 +15,4 @@ export const CreateUserUseCase: UseCase<UserCreateRequest, UserCreateResponse> =
         throw new Error("Function not implemented.");
     }
 };
+

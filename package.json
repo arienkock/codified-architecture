@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "codegen": "prisma generate && npm run generate:openapi",
+    "codegen": "prisma generate && npm run generate:openapi && npm run generate:domain-handlers",
     "build": "npm run codegen && tsc",
-    "generate:openapi": "tsx scripts/generate-openapi-json.ts"
+    "generate:openapi": "tsx scripts/generate-openapi-json.ts",
+    "generate:domain-handlers": "tsx scripts/generate-openapi-handlers.ts"
   },
   "keywords": [],
   "author": "",
