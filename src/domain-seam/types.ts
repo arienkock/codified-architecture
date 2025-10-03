@@ -1,6 +1,12 @@
-import { Prisma } from "../persistence/generated/prisma";
-import { UserResultType } from "../persistence/generated/zod/schemas";
+import z from "zod";
+import { UserResultSchema, UserCreateInputObjectZodSchema } from "../persistence/generated/zod/schemas";
 
-export type UserCreateRequest = Prisma.UserUncheckedCreateInput
+export const UserCreateRequestSchema = UserCreateInputObjectZodSchema.omit({ hashedPassword: true })
 
-export type UserCreateResponse = UserResultType
+export type UserCreateRequest = z.infer<typeof UserCreateRequestSchema>
+
+export const UserCreateResponseSchema = UserResultSchema.omit({ hashedPassword: true })
+
+export type UserCreateResponse = z.infer<typeof UserCreateResponseSchema>
+
+

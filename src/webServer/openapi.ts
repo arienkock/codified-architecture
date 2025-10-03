@@ -1,42 +1,58 @@
-import { z } from 'zod';
-
 import { createDocument } from 'zod-openapi';
 
-const jobId = z.string().meta({
-  description: 'A unique identifier for a job',
-  example: '12345',
-  id: 'jobId',
-});
-
-const title = z.string().meta({
-  description: 'Job title',
-  example: 'My job',
-});
+import { UserCreateRequestSchema, UserCreateResponseSchema } from '../domain-seam/types';
 
 export const document: ReturnType<typeof createDocument> = createDocument({
   openapi: '3.1.0',
   info: {
-    title: 'My API',
-    version: '1.0.0',
+    title: 'User Service API',
+    version: '0.1.0',
+    description: 'OpenAPI documentation for user-related endpoints.',
   },
   paths: {
-    '/jobs/{jobId}': {
-      put: {
-        requestParams: { path: z.object({ jobId }) },
+    '/users': {
+      post: {
+        summary: 'Create a user',
+        description: 'Accepts user details and creates a new user record.',
         requestBody: {
+          required: true,
           content: {
-            'application/json': { schema: z.object({ title }) },
+            'application/json': {
+              schema: UserCreateRequestSchema.meta({
+                description: 'User creation payload.',
+                example: {
+                  email: 'user@example.com',
+                  name: 'Taylor',
+                },
+              }),
+            },
           },
         },
         responses: {
-          '200': {
-            description: '200 OK',
+          201: {
+            description: 'User successfully created.',
             content: {
-              'application/json': { schema: z.object({ jobId, title }) },
+              'application/json': {
+                schema: UserCreateResponseSchema.meta({
+                  description: 'Representation of the newly created user.',
+                  example: {
+                    id: 1,
+                    email: 'user@example.com',
+                    name: 'Taylor',
+                  },
+                }),
+              },
             },
+          },
+          400: {
+            description: 'The request payload was invalid.',
+          },
+          401: {
+            description: 'The request was not authorized.',
           },
         },
       },
     },
   },
 });
+

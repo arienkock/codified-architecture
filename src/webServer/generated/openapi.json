@@ -1,78 +1,99 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "My API",
-    "version": "1.0.0"
+    "title": "User Service API",
+    "version": "0.1.0",
+    "description": "OpenAPI documentation for user-related endpoints."
   },
   "paths": {
-    "/jobs/{jobId}": {
-      "put": {
-        "parameters": [
-          {
-            "in": "path",
-            "name": "jobId",
-            "schema": {
-              "$ref": "#/components/schemas/jobId"
-            },
-            "required": true,
-            "description": "A unique identifier for a job"
-          }
-        ],
+    "/users": {
+      "post": {
+        "summary": "Create a user",
+        "description": "Accepts user details and creates a new user record.",
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
+                "description": "User creation payload.",
+                "example": {
+                  "email": "user@example.com",
+                  "name": "Taylor"
+                },
                 "type": "object",
                 "properties": {
-                  "title": {
-                    "description": "Job title",
-                    "example": "My job",
+                  "email": {
                     "type": "string"
+                  },
+                  "name": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   }
                 },
                 "required": [
-                  "title"
-                ]
+                  "email"
+                ],
+                "additionalProperties": false
               }
             }
           }
         },
         "responses": {
-          "200": {
-            "description": "200 OK",
+          "201": {
+            "description": "User successfully created.",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Representation of the newly created user.",
+                  "example": {
+                    "id": 1,
+                    "email": "user@example.com",
+                    "name": "Taylor"
+                  },
                   "type": "object",
                   "properties": {
-                    "jobId": {
-                      "$ref": "#/components/schemas/jobId"
+                    "id": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
                     },
-                    "title": {
-                      "description": "Job title",
-                      "example": "My job",
+                    "email": {
                       "type": "string"
+                    },
+                    "name": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     }
                   },
                   "required": [
-                    "jobId",
-                    "title"
+                    "id",
+                    "email",
+                    "name"
                   ],
                   "additionalProperties": false
                 }
               }
             }
+          },
+          "400": {
+            "description": "The request payload was invalid."
+          },
+          "401": {
+            "description": "The request was not authorized."
           }
         }
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "jobId": {
-        "description": "A unique identifier for a job",
-        "example": "12345",
-        "type": "string"
       }
     }
   }

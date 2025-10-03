@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "codegen": "prisma generate",
+    "codegen": "prisma generate && npm run generate:openapi",
     "build": "npm run codegen && tsc",
     "generate:openapi": "tsx scripts/generate-openapi-json.ts"
   },
