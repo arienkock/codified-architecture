@@ -105,7 +105,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const templatePath = path.resolve(__dirname, './templates/domain-handler.ts.tpl');
-const outputDir = path.resolve(__dirname, '../src/domain/generated');
+const outputDir = path.resolve(__dirname, '../src/webServer/generated/handlers');
 const openApiModulePath = path.resolve(__dirname, '../src/webServer/openapi.ts');
 
 (async () => {

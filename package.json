@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "codegen": "prisma generate && npm run generate:openapi && npm run generate:domain-handlers",
+    "codegen": "npm run generate",
+    "generate": "npm run generate:prisma && npm run generate:openapi && npm run generate:domain-handlers",
     "build": "npm run codegen && tsc",
+    "generate:prisma": "prisma generate",
     "generate:openapi": "tsx scripts/generate-openapi-json.ts",
     "generate:domain-handlers": "tsx scripts/generate-openapi-handlers.ts"
   },
@@ -15,11 +17,14 @@
   "dependencies": {
     "@prisma/client": "^6.16.2",
     "express": "^5.1.0",
+    "pino": "^9.4.0",
+    "pino-http": "^10.1.0",
     "typescript": "^5.9.2",
     "zod": "^4.1.11",
     "zod-openapi": "^5.4.2"
   },
   "devDependencies": {
+    "@types/express": "^5.0.0",
     "@types/node": "^24.5.2",
     "prisma": "^6.16.2",
     "prisma-zod-generator": "^1.22.2",

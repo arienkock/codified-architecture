@@ -34,10 +34,16 @@
                         "type": "null"
                       }
                     ]
+                  },
+                  "password": {
+                    "description": "Plain text password that is hashed before persistence.",
+                    "type": "string",
+                    "minLength": 12
                   }
                 },
                 "required": [
-                  "email"
+                  "email",
+                  "password"
                 ],
                 "additionalProperties": false
               }

@@ -1,12 +1,17 @@
-import { PrismaClient, Prisma } from "./generated/prisma"
+import { createServer } from './webServer/server';
 
-import { UserInputSchema } from "./generated/zod/schemas";
+async function main(): Promise<void> {
+  const { app, logger } = createServer();
 
-const prisma = new PrismaClient()
+  const port = Number.parseInt(process.env.PORT ?? '3000', 10);
 
-console.log(UserInputSchema.parse({
-    email: "asd",
-    hashedPassword: "asd"
-}))
+  app.listen(port, () => {
+    logger.info({ port }, 'HTTP server listening');
+  });
+}
 
-prisma.user.create
+main().catch((error) => {
+  // eslint-disable-next-line no-console
+  console.error('Failed to start server', error);
+  process.exit(1);
+});
