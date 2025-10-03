@@ -15,11 +15,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "description": "User creation payload.",
-                "example": {
-                  "email": "user@example.com",
-                  "name": "Taylor"
-                },
+                "schemaName": "UserCreateRequestSchema",
                 "type": "object",
                 "properties": {
                   "email": {
@@ -45,11 +41,7 @@
                   "email",
                   "password"
                 ],
-                "additionalProperties": false,
-                "x-schema-source": {
-                  "module": "src/domain-seam/types.ts",
-                  "exportName": "UserCreateRequestSchema"
-                }
+                "additionalProperties": false
               }
             }
           }
@@ -60,12 +52,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "description": "Representation of the newly created user.",
-                  "example": {
-                    "id": 1,
-                    "email": "user@example.com",
-                    "name": "Taylor"
-                  },
+                  "schemaName": "UserCreateResponseSchema",
                   "type": "object",
                   "properties": {
                     "id": {
@@ -92,20 +79,13 @@
                     "email",
                     "name"
                   ],
-                  "additionalProperties": false,
-                  "x-schema-source": {
-                    "module": "src/domain-seam/types.ts",
-                    "exportName": "UserCreateResponseSchema"
-                  }
+                  "additionalProperties": false
                 }
               }
             }
           },
           "400": {
             "description": "The request payload was invalid."
-          },
-          "401": {
-            "description": "The request was not authorized."
           }
         }
       }

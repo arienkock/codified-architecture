@@ -7,6 +7,7 @@ import express, {
 } from 'express';
 import pino from 'pino';
 import pinoHttp from 'pino-http';
+import { registerGeneratedHandlers } from './registerHandlers.js';
 
 export interface ServerOptions {
   /**
@@ -68,6 +69,9 @@ export function createServer(options: ServerOptions = {}): ServerInstance {
   app.get('/healthz', (_req: Request, res: Response) => {
     res.status(200).json({ status: 'ok' });
   });
+
+  // Register generated handlers dynamically
+  registerGeneratedHandlers(app, logger);
 
   app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
     logger.error({ err }, 'Unhandled error');

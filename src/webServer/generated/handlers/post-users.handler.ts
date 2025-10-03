@@ -5,6 +5,7 @@
 
 import { z } from 'zod';
 import * as DomainSeamTypes from '../../../domain-seam/types';
+import { HandlerContract } from '../../handlerContract';
 // Domain schemas are accessed via the namespace import inserted above.
 
 const pathParamsSchema = z.object({});
@@ -27,7 +28,7 @@ export type PostUsersHandlerResponseBodies = {
   "400": z.infer<(typeof responseSchemas)["400"]>;
 };
 
-export const postUsersHandler = {
+export const postUsersHandler: HandlerContract = {
   method: 'POST' as const,
   path: '/users' as const,
   pathParamsSchema,
