@@ -9,6 +9,7 @@ interface ReferenceObject {
 }
 
 interface SchemaObject {
+  schemaName?: string;
   type?: string | string[];
   format?: string;
   nullable?: boolean;
@@ -108,6 +109,9 @@ const templatePath = path.resolve(__dirname, './templates/domain-handler.ts.tpl'
 const outputDir = path.resolve(__dirname, '../src/webServer/generated/handlers');
 const openApiModulePath = path.resolve(__dirname, '../src/webServer/openapi.ts');
 
+const domainSeamTypesModulePath = path.resolve(__dirname, '../src/domain-seam/types.ts');
+const DOMAIN_SEAM_NAMESPACE = 'DomainSeamTypes';
+
 (async () => {
   const template = await readFile(templatePath, 'utf8');
   await rm(outputDir, { recursive: true, force: true });
@@ -122,10 +126,21 @@ const openApiModulePath = path.resolve(__dirname, '../src/webServer/openapi.ts')
       const operation = pathItem[method];
       if (!operation) continue;
 
+      const handlerBaseName = toPascalCase(
+        operation.operationId ?? `${method} ${routePath}`
+      );
+      const handlerName = `${handlerBaseName}Handler`;
+      const handlerVarName = toCamelCase(handlerName);
+      const fileStem = `${toKebabCase(handlerBaseName)}.handler`;
+      const handlerFilePath = path.join(outputDir, `${fileStem}.ts`);
+
       const context: SchemaContext = {
         document,
         seenRefs: new Set<string>(),
       };
+
+      const domainSeamImportPath = toImportPath(path.dirname(handlerFilePath), domainSeamTypesModulePath);
+      const additionalImports = `import * as ${DOMAIN_SEAM_NAMESPACE} from '${domainSeamImportPath}';`;
 
       const allParameters = [
         ...(pathItem.parameters ?? []),
@@ -138,15 +153,8 @@ const openApiModulePath = path.resolve(__dirname, '../src/webServer/openapi.ts')
       const requestBodySchema = buildRequestBodySchema(operation, context);
       const responseSchemas = buildResponseSchemas(operation, context);
 
-      const handlerBaseName = toPascalCase(
-        operation.operationId ?? `${method} ${routePath}`
-      );
-      const handlerName = `${handlerBaseName}Handler`;
-      const handlerVarName = toCamelCase(handlerName);
-      const fileStem = `${toKebabCase(handlerBaseName)}.handler`;
-      const handlerFilePath = path.join(outputDir, `${fileStem}.ts`);
-
       const filledTemplate = fillTemplate(template, {
+        ADDITIONAL_IMPORTS: additionalImports,
         PATH_PARAMS_SCHEMA: pathParamsSchema,
         QUERY_PARAMS_SCHEMA: queryParamsSchema,
         HEADER_PARAMS_SCHEMA: headerParamsSchema,
@@ -317,6 +325,13 @@ function schemaToZod(schema: SchemaOrRef | undefined, context: SchemaContext): s
     return 'z.undefined()';
   }
 
+  if (!isReferenceObject(schema)) {
+    const schemaReference = resolveSchemaReference(schema);
+    if (schemaReference) {
+      return schemaReference;
+    }
+  }
+
   if (isReferenceObject(schema)) {
     const ref = schema.$ref;
     if (context.seenRefs.has(ref)) {
@@ -392,6 +407,14 @@ function schemaToZod(schema: SchemaOrRef | undefined, context: SchemaContext): s
   }
 
   return code;
+}
+
+function resolveSchemaReference(schema: SchemaObject): string | undefined {
+  const { schemaName } = schema;
+  if (typeof schemaName === 'string' && schemaName.length > 0) {
+    return `${DOMAIN_SEAM_NAMESPACE}.${schemaName}`;
+  }
+  return undefined;
 }
 
 function buildStringSchema(schema: SchemaObject): string {
@@ -690,6 +713,15 @@ function resolveRef(ref: string, document: OpenAPIObject): unknown {
 
 function decodePointerSegment(segment: string): string {
   return segment.replace(/~1/g, '/').replace(/~0/g, '~');
+}
+
+function toImportPath(fromDir: string, targetModulePath: string): string {
+  let relativePath = path.relative(fromDir, targetModulePath);
+  relativePath = relativePath.replace(/\\/g, '/');
+  if (!relativePath.startsWith('.')) {
+    relativePath = `./${relativePath}`;
+  }
+  return relativePath.replace(/\.[^/.]+$/, '');
 }
 
 function toPascalCase(value: string): string {

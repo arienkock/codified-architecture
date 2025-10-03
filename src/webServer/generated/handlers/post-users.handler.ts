@@ -4,24 +4,17 @@
  */
 
 import { z } from 'zod';
+import * as DomainSeamTypes from '../../../domain-seam/types';
+// Domain schemas are accessed via the namespace import inserted above.
 
 const pathParamsSchema = z.object({});
 const queryParamsSchema = z.object({});
 const headerParamsSchema = z.object({});
-const requestBodySchema = z.object({
-  "email": z.string(),
-  "name": z.string().nullable().optional(),
-  "password": z.string().min(12).describe("Plain text password that is hashed before persistence.")
-}).strict().describe("User creation payload.");
+const requestBodySchema = DomainSeamTypes.UserCreateRequestSchema;
 
 const responseSchemas = {
-  "201": z.object({
-      "id": z.number().int().min(-9007199254740991).max(9007199254740991),
-      "email": z.string(),
-      "name": z.string().nullable()
-    }).strict().describe("Representation of the newly created user."),
+  "201": DomainSeamTypes.UserCreateResponseSchema,
   "400": z.undefined().describe("The request payload was invalid."),
-  "401": z.undefined().describe("The request was not authorized."),
 } as const;
 
 export type PostUsersHandlerPathParams = z.infer<typeof pathParamsSchema>;
@@ -32,7 +25,6 @@ export type PostUsersHandlerResponseStatus = keyof typeof responseSchemas;
 export type PostUsersHandlerResponseBodies = {
   "201": z.infer<(typeof responseSchemas)["201"]>;
   "400": z.infer<(typeof responseSchemas)["400"]>;
-  "401": z.infer<(typeof responseSchemas)["401"]>;
 };
 
 export const postUsersHandler = {

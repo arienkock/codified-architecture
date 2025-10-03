@@ -4,6 +4,8 @@
  */
 
 import { z } from 'zod';
+{{ADDITIONAL_IMPORTS}}
+// Domain schemas are accessed via the namespace import inserted above.
 
 const pathParamsSchema = {{PATH_PARAMS_SCHEMA}};
 const queryParamsSchema = {{QUERY_PARAMS_SCHEMA}};

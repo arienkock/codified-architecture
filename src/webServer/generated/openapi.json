@@ -45,7 +45,11 @@
                   "email",
                   "password"
                 ],
-                "additionalProperties": false
+                "additionalProperties": false,
+                "x-schema-source": {
+                  "module": "src/domain-seam/types.ts",
+                  "exportName": "UserCreateRequestSchema"
+                }
               }
             }
           }
@@ -88,7 +92,11 @@
                     "email",
                     "name"
                   ],
-                  "additionalProperties": false
+                  "additionalProperties": false,
+                  "x-schema-source": {
+                    "module": "src/domain-seam/types.ts",
+                    "exportName": "UserCreateResponseSchema"
+                  }
                 }
               }
             }
