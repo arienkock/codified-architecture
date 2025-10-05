@@ -418,6 +418,481 @@
           }
         }
       }
+    },
+    "/users/{id}": {
+      "patch": {
+        "summary": "Update a user",
+        "description": "Updates an existing user record with the provided details.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The ID of the user to update"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "schemaName": "UserUpdateRequestSchema",
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                  },
+                  "name": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "password": {
+                    "description": "Plain text password that is hashed before persistence.",
+                    "type": "string",
+                    "minLength": 12
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "schemaName": "UserUpdateUseCaseResponseSchema",
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean"
+                        },
+                        "pagination": {
+                          "type": "object",
+                          "properties": {
+                            "total": {
+                              "type": "number"
+                            },
+                            "page": {
+                              "type": "number"
+                            },
+                            "pageSize": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "total",
+                            "page",
+                            "pageSize"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "warnings": {
+                          "type": "array",
+                          "items": {}
+                        },
+                        "errors": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "message": {
+                                "type": "string"
+                              },
+                              "field": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "code",
+                              "message"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "success"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "email",
+                        "name"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "meta"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error - the request payload was invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "schemaName": "ErrorResponseSchema",
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean",
+                          "const": false
+                        },
+                        "errors": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "message": {
+                                "type": "string"
+                              },
+                              "field": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "code",
+                              "message"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "success",
+                        "errors"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "meta"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - authentication required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "schemaName": "ErrorResponseSchema",
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean",
+                          "const": false
+                        },
+                        "errors": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "message": {
+                                "type": "string"
+                              },
+                              "field": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "code",
+                              "message"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "success",
+                        "errors"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "meta"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - insufficient permissions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "schemaName": "ErrorResponseSchema",
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean",
+                          "const": false
+                        },
+                        "errors": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "message": {
+                                "type": "string"
+                              },
+                              "field": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "code",
+                              "message"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "success",
+                        "errors"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "meta"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found - the user does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "schemaName": "ErrorResponseSchema",
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean",
+                          "const": false
+                        },
+                        "errors": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "message": {
+                                "type": "string"
+                              },
+                              "field": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "code",
+                              "message"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "success",
+                        "errors"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "meta"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Business logic error - the request was valid but could not be processed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "schemaName": "ErrorResponseSchema",
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean",
+                          "const": false
+                        },
+                        "errors": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "message": {
+                                "type": "string"
+                              },
+                              "field": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "code",
+                              "message"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "success",
+                        "errors"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "meta"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "schemaName": "ErrorResponseSchema",
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean",
+                          "const": false
+                        },
+                        "errors": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "message": {
+                                "type": "string"
+                              },
+                              "field": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "code",
+                              "message"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "success",
+                        "errors"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "meta"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

@@ -38,6 +38,56 @@ const POST_USERS = {
   },
 }
 
+const PATCH_USERS_ID = {
+  summary: 'Update a user',
+  description: 'Updates an existing user record with the provided details.',
+  parameters: [
+    {
+      name: 'id',
+      in: 'path' as const,
+      required: true,
+      schema: {
+        type: 'integer' as const,
+      },
+      description: 'The ID of the user to update',
+    },
+  ],
+  requestBody: {
+    required: true,
+    content: createContent("UserUpdateRequestSchema"),
+  },
+  responses: {
+    200: {
+      description: 'User successfully updated.',
+      content: createContent("UserUpdateUseCaseResponseSchema"),
+    },
+    400: {
+      description: 'Validation error - the request payload was invalid.',
+      content: createContent("ErrorResponseSchema"),
+    },
+    401: {
+      description: 'Unauthorized - authentication required.',
+      content: createContent("ErrorResponseSchema"),
+    },
+    403: {
+      description: 'Forbidden - insufficient permissions.',
+      content: createContent("ErrorResponseSchema"),
+    },
+    404: {
+      description: 'Not found - the user does not exist.',
+      content: createContent("ErrorResponseSchema"),
+    },
+    422: {
+      description: 'Business logic error - the request was valid but could not be processed.',
+      content: createContent("ErrorResponseSchema"),
+    },
+    500: {
+      description: 'Internal server error.',
+      content: createContent("ErrorResponseSchema"),
+    }
+  },
+}
+
 
 export const document: ReturnType<typeof createDocument> = (() => {
   const doc = createDocument({
@@ -50,6 +100,9 @@ export const document: ReturnType<typeof createDocument> = (() => {
     paths: {
       '/users': {
         post: POST_USERS,
+      },
+      '/users/{id}': {
+        patch: PATCH_USERS_ID,
       }
     },
   });
