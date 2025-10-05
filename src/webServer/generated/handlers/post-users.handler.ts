@@ -15,7 +15,11 @@ const requestBodySchema = DomainSeamTypes.UserCreateRequestSchema;
 
 const responseSchemas = {
   "201": DomainSeamTypes.UserCreateUseCaseResponseSchema,
-  "400": z.undefined().describe("The request payload was invalid."),
+  "400": DomainSeamTypes.ErrorResponseSchema,
+  "401": DomainSeamTypes.ErrorResponseSchema,
+  "403": DomainSeamTypes.ErrorResponseSchema,
+  "422": DomainSeamTypes.ErrorResponseSchema,
+  "500": DomainSeamTypes.ErrorResponseSchema,
 } as const;
 
 export type PostUsersHandlerPathParams = z.infer<typeof pathParamsSchema>;
@@ -26,10 +30,14 @@ export type PostUsersHandlerResponseStatus = keyof typeof responseSchemas;
 export type PostUsersHandlerResponseBodies = {
   "201": z.infer<(typeof responseSchemas)["201"]>;
   "400": z.infer<(typeof responseSchemas)["400"]>;
+  "401": z.infer<(typeof responseSchemas)["401"]>;
+  "403": z.infer<(typeof responseSchemas)["403"]>;
+  "422": z.infer<(typeof responseSchemas)["422"]>;
+  "500": z.infer<(typeof responseSchemas)["500"]>;
 };
 
 // Discriminated union type for type-safe responses
-export type PostUsersHandlerResponse = { status: "201"; body: PostUsersHandlerResponseBodies["201"] } | { status: "400"; body: PostUsersHandlerResponseBodies["400"] };
+export type PostUsersHandlerResponse = { status: "201"; body: PostUsersHandlerResponseBodies["201"] } | { status: "400"; body: PostUsersHandlerResponseBodies["400"] } | { status: "401"; body: PostUsersHandlerResponseBodies["401"] } | { status: "403"; body: PostUsersHandlerResponseBodies["403"] } | { status: "422"; body: PostUsersHandlerResponseBodies["422"] } | { status: "500"; body: PostUsersHandlerResponseBodies["500"] };
 
 export const postUsersHandler: HandlerContract<
   PostUsersHandlerPathParams,

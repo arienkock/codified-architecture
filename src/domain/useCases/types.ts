@@ -9,13 +9,22 @@ export interface RequestContext {
     app: AppContext,
 }
 
+export interface ValidationError {
+    code: string;
+    message: string;
+    field?: string;
+}
+
 export class ValidationResults {
     static OK: ValidationResults
     
-    constructor(public success: boolean) {}
+    constructor(
+        public success: boolean,
+        public errors: ValidationError[] = []
+    ) {}
 }
 
-ValidationResults.OK = new ValidationResults(true)
+ValidationResults.OK = new ValidationResults(true, [])
 
 export interface PaginationMetadata {
     total: number,
@@ -27,7 +36,8 @@ export interface UseCaseResponse<T> {
     meta: {
         success: boolean,
         pagination?: PaginationMetadata,
-        warnings?: any[]
+        warnings?: any[],
+        errors?: ValidationError[]
     },
     data?: T,
 }
@@ -39,10 +49,17 @@ export const PaginationMetadataSchema = z.object({
     pageSize: z.number()
 });
 
+export const ValidationErrorSchema = z.object({
+    code: z.string(),
+    message: z.string(),
+    field: z.string().optional()
+});
+
 export const UseCaseResponseMetaSchema = z.object({
     success: z.boolean(),
     pagination: PaginationMetadataSchema.optional(),
-    warnings: z.array(z.any()).optional()
+    warnings: z.array(z.any()).optional(),
+    errors: z.array(ValidationErrorSchema).optional()
 });
 
 /**
