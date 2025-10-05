@@ -1,5 +1,5 @@
 import z from "zod";
-import { UserResultSchema, UserCreateInputObjectZodSchema, UserUpdateInputObjectZodSchema } from "../persistence/generated/zod/schemas";
+import { UserResultSchema, UserCreateInputObjectZodSchema, UserUncheckedUpdateInputObjectZodSchema } from "../persistence/generated/zod/schemas";
 import { wrapUseCaseResponse, ValidationErrorSchema, UseCaseResponseMetaSchema } from "../domain/useCases/types";
 
 export const UserCreateRequestSchema = UserCreateInputObjectZodSchema
@@ -22,16 +22,17 @@ export const UserCreateUseCaseResponseSchema = wrapUseCaseResponse(UserCreateRes
 
 export type UserCreateUseCaseResponse = z.infer<typeof UserCreateUseCaseResponseSchema>
 
-export const UserUpdateRequestSchema = z.object({
-    email: z.string().email().optional(),
-    name: z.string().optional().nullable(),
-    password: z.string()
-        .min(12)
-        .optional()
-        .meta({
-            description: "Plain text password that is hashed before persistence."
-        })
-}).strict()
+export const UserUpdateRequestSchema = UserUncheckedUpdateInputObjectZodSchema
+    .omit({ id: true, hashedPassword: true })
+    .extend({
+        password: z.string()
+            .min(12)
+            .optional()
+            .meta({
+                description: "Plain text password that is hashed before persistence."
+            })
+    })
+    .partial()
 
 export type UserUpdateRequest = z.infer<typeof UserUpdateRequestSchema>
 
