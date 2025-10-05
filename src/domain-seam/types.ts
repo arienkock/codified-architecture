@@ -1,5 +1,6 @@
 import z from "zod";
 import { UserResultSchema, UserCreateInputObjectZodSchema } from "../persistence/generated/zod/schemas";
+import { wrapUseCaseResponse } from "../domain/useCases/types";
 
 export const UserCreateRequestSchema = UserCreateInputObjectZodSchema
     .omit({ hashedPassword: true })
@@ -17,4 +18,6 @@ export const UserCreateResponseSchema = UserResultSchema.omit({ hashedPassword: 
 
 export type UserCreateResponse = z.infer<typeof UserCreateResponseSchema>
 
+export const UserCreateUseCaseResponseSchema = wrapUseCaseResponse(UserCreateResponseSchema)
 
+export type UserCreateUseCaseResponse = z.infer<typeof UserCreateUseCaseResponseSchema>

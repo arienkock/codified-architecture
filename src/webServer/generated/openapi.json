@@ -52,32 +52,77 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "schemaName": "UserCreateResponseSchema",
+                  "schemaName": "UserCreateUseCaseResponseSchema",
                   "type": "object",
                   "properties": {
-                    "id": {
-                      "type": "integer",
-                      "minimum": -9007199254740991,
-                      "maximum": 9007199254740991
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean"
+                        },
+                        "pagination": {
+                          "type": "object",
+                          "properties": {
+                            "total": {
+                              "type": "number"
+                            },
+                            "page": {
+                              "type": "number"
+                            },
+                            "pageSize": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "total",
+                            "page",
+                            "pageSize"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "warnings": {
+                          "type": "array",
+                          "items": {}
+                        }
+                      },
+                      "required": [
+                        "success"
+                      ],
+                      "additionalProperties": false
                     },
-                    "email": {
-                      "type": "string"
-                    },
-                    "name": {
-                      "anyOf": [
-                        {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "email": {
                           "type": "string"
                         },
-                        {
-                          "type": "null"
+                        "name": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         }
-                      ]
+                      },
+                      "required": [
+                        "id",
+                        "email",
+                        "name"
+                      ],
+                      "additionalProperties": false
                     }
                   },
                   "required": [
-                    "id",
-                    "email",
-                    "name"
+                    "meta"
                   ],
                   "additionalProperties": false
                 }

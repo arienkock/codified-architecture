@@ -1,6 +1,6 @@
 import { RequestContext } from '../useCases/types.js';
 import { CreateUserUseCase } from '../useCases/CreateUserUseCase.js';
-import { UserCreateRequest, UserCreateResponse } from '../../domain-seam/types.js';
+import { UserCreateRequest, UserCreateUseCaseResponse } from '../../domain-seam/types.js';
 
 export interface PostUsersHandlerParams {
   pathParams: Record<string, never>;
@@ -11,7 +11,7 @@ export interface PostUsersHandlerParams {
 }
 
 export type PostUsersHandlerResponse = 
-  | { status: "201"; body: UserCreateResponse }
+  | { status: "201"; body: UserCreateUseCaseResponse }
   | { status: "400"; body: undefined };
 
 export async function handleRequest(
@@ -43,8 +43,9 @@ export async function handleRequest(
   // Execute the use case
   const useCaseResponse = CreateUserUseCase.execute(requestContext, validatedRequest);
 
+  // Return the full use case response with meta and data
   return {
     status: "201",
-    body: useCaseResponse.data
+    body: useCaseResponse
   };
 }

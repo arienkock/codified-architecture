@@ -1,4 +1,6 @@
 
+import { z } from "zod";
+
 export interface AppContext {
 
 }
@@ -22,11 +24,36 @@ export interface PaginationMetadata {
 }
 
 export interface UseCaseResponse<T> {
-    meta?: {
+    meta: {
+        success: boolean,
         pagination?: PaginationMetadata,
         warnings?: any[]
     },
-    data: T,
+    data?: T,
+}
+
+// Zod schemas for UseCaseResponse structure
+export const PaginationMetadataSchema = z.object({
+    total: z.number(),
+    page: z.number(),
+    pageSize: z.number()
+});
+
+export const UseCaseResponseMetaSchema = z.object({
+    success: z.boolean(),
+    pagination: PaginationMetadataSchema.optional(),
+    warnings: z.array(z.any()).optional()
+});
+
+/**
+ * Generic wrapper function to wrap any Zod schema with the UseCaseResponse structure.
+ * This ensures all use case responses follow the same format with meta and data fields.
+ */
+export function wrapUseCaseResponse<T extends z.ZodTypeAny>(dataSchema: T) {
+    return z.object({
+        meta: UseCaseResponseMetaSchema,
+        data: dataSchema.optional()
+    });
 }
 
 export interface UseCase<Req, Res>  {
@@ -34,4 +61,3 @@ export interface UseCase<Req, Res>  {
     isAuthorized(rc: RequestContext, cur: Req): boolean
     execute(rc: RequestContext, cur: Req): UseCaseResponse<Res>
 }
-

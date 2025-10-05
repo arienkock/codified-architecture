@@ -13,7 +13,7 @@ const POST_USERS = {
   responses: {
     201: {
       description: 'User successfully created.',
-      content: createContent("UserCreateResponseSchema"),
+      content: createContent("UserCreateUseCaseResponseSchema"),
     },
     400: {
       description: 'The request payload was invalid.',

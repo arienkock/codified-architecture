@@ -14,7 +14,7 @@ const headerParamsSchema = z.object({});
 const requestBodySchema = DomainSeamTypes.UserCreateRequestSchema;
 
 const responseSchemas = {
-  "201": DomainSeamTypes.UserCreateResponseSchema,
+  "201": DomainSeamTypes.UserCreateUseCaseResponseSchema,
   "400": z.undefined().describe("The request payload was invalid."),
 } as const;
 
