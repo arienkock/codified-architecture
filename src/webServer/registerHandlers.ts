@@ -38,33 +38,24 @@ function createHandlerMiddleware(handler: HandlerContract, logger: pino.Logger) 
       // Parse and validate request body
       const requestBody = handler.parseRequestBody(req.body);
 
-      // TODO: Here we would invoke the domain use case
-      // For now, return a placeholder response
-      const responseData = {
-        message: 'Handler registered successfully',
-        path: handler.path,
-        method: handler.method,
-        parsedParams: {
-          path: pathParams,
-          query: queryParams,
-          headers: headerParams,
-          body: requestBody,
-        },
-      };
+      // Call the handler with parsed parameters
+      const response = await handler.handle({
+        pathParams,
+        queryParams,
+        headerParams,
+        requestBody,
+      });
 
-      // Parse response through schema (for type safety)
-      const validatedResponse = handler.parseResponse('200', responseData);
-
-      res.status(200).json(validatedResponse);
+      // Send the response - TypeScript ensures the body matches the status code schema
+      res.status(response.status).json(response.body);
     } catch (error) {
       logger.error({ error, path: handler.path, method: handler.method }, 'Handler execution failed');
 
       // Check if it's a Zod validation error
       if (error instanceof Error && 'issues' in error) {
-        // Zod validation error
+        // Zod validation error - return 400 if defined in response schemas
         const statusCode = handler.responseSchemas['400'] ? 400 : 500;
-        const errorResponse = handler.parseResponse(statusCode.toString(), undefined);
-        res.status(statusCode).json(errorResponse);
+        res.status(statusCode).json(undefined);
         return;
       }
 

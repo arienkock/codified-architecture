@@ -161,6 +161,7 @@ const DOMAIN_SEAM_NAMESPACE = 'DomainSeamTypes';
         REQUEST_BODY_SCHEMA: requestBodySchema,
         RESPONSE_SCHEMAS: renderResponseSchemas(responseSchemas),
         HANDLER_RESPONSE_TYPE_MAP: renderResponseTypeMap(responseSchemas),
+        HANDLER_RESPONSE_UNION: renderResponseUnion(responseSchemas, handlerName),
         HANDLER_NAME: handlerName,
         HANDLER_VAR_NAME: handlerVarName,
         HTTP_METHOD: method.toUpperCase(),
@@ -300,6 +301,24 @@ function renderResponseTypeMap(entries: Array<{ status: string; schemaCode: stri
       return `  ${literal}: z.infer<(typeof responseSchemas)[${literal}]>;`;
     })
     .join('\n');
+}
+
+function renderResponseUnion(entries: Array<{ status: string; schemaCode: string }>, handlerName: string): string {
+  if (entries.length === 0) {
+    return '{ status: number; body: unknown }';
+  }
+
+  if (entries.length === 1) {
+    const statusLiteral = JSON.stringify(entries[0].status);
+    return `{ status: ${statusLiteral}; body: ${handlerName}ResponseBodies[${statusLiteral}] }`;
+  }
+
+  const unionMembers = entries.map((entry) => {
+    const statusLiteral = JSON.stringify(entry.status);
+    return `{ status: ${statusLiteral}; body: ${handlerName}ResponseBodies[${statusLiteral}] }`;
+  });
+
+  return unionMembers.join(' | ');
 }
 
 function renderObjectEntry(keyLiteral: string, valueCode: string, indentSpaces = 2): string {

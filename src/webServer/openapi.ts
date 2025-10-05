@@ -2,6 +2,26 @@ import { createDocument } from 'zod-openapi';
 
 import * as TypesAndSchemas from '../domain-seam/types';
 
+
+const POST_USERS = {
+  summary: 'Create a user',
+  description: 'Accepts user details and creates a new user record.',
+  requestBody: {
+    required: true,
+    content: createContent("UserCreateRequestSchema"),
+  },
+  responses: {
+    201: {
+      description: 'User successfully created.',
+      content: createContent("UserCreateResponseSchema"),
+    },
+    400: {
+      description: 'The request payload was invalid.',
+    }
+  },
+}
+
+
 export const document: ReturnType<typeof createDocument> = (() => {
   const doc = createDocument({
     openapi: '3.1.0',
@@ -12,33 +32,17 @@ export const document: ReturnType<typeof createDocument> = (() => {
     },
     paths: {
       '/users': {
-        post: {
-          summary: 'Create a user',
-          description: 'Accepts user details and creates a new user record.',
-          requestBody: {
-            required: true,
-            content: {
-              'application/json': {
-                schema: TypesAndSchemas["UserCreateRequestSchema"].meta({schemaName: "UserCreateRequestSchema"}),
-              },
-            },
-          },
-          responses: {
-            201: {
-              description: 'User successfully created.',
-              content: {
-                'application/json': {
-                  schema: TypesAndSchemas["UserCreateResponseSchema"].meta({schemaName: "UserCreateResponseSchema"}),
-                },
-              },
-            },
-            400: {
-              description: 'The request payload was invalid.',
-            }
-          },
-        },
-      },
+        post: POST_USERS,
+      }
     },
   });
   return doc;
 })();
+
+function createContent(schemaName: keyof typeof TypesAndSchemas) {
+  return {
+    'application/json': {
+      schema: TypesAndSchemas[schemaName].meta({ schemaName: schemaName }),
+    }
+  }
+}

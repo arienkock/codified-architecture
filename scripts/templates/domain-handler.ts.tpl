@@ -4,6 +4,7 @@
  */
 
 import { z } from 'zod';
+import { HandlerContract } from '../../handlerContract.js';
 {{ADDITIONAL_IMPORTS}}
 // Domain schemas are accessed via the namespace import inserted above.
 
@@ -25,7 +26,16 @@ export type {{HANDLER_NAME}}ResponseBodies = {
 {{HANDLER_RESPONSE_TYPE_MAP}}
 };
 
-export const {{HANDLER_VAR_NAME}} = {
+// Discriminated union type for type-safe responses
+export type {{HANDLER_NAME}}Response = {{HANDLER_RESPONSE_UNION}};
+
+export const {{HANDLER_VAR_NAME}}: HandlerContract<
+  {{HANDLER_NAME}}PathParams,
+  {{HANDLER_NAME}}QueryParams,
+  {{HANDLER_NAME}}HeaderParams,
+  {{HANDLER_NAME}}RequestBody,
+  {{HANDLER_NAME}}Response
+> = {
   method: '{{HTTP_METHOD}}' as const,
   path: '{{PATH}}' as const,
   pathParamsSchema,
@@ -45,11 +55,9 @@ export const {{HANDLER_VAR_NAME}} = {
   parseRequestBody(input: unknown) {
     return requestBodySchema.parse(input);
   },
-  parseResponse<TStatus extends keyof typeof responseSchemas>(status: TStatus, payload: unknown) {
-    const schema = responseSchemas[status];
-    if (!schema) {
-      throw new Error(`Unsupported status code: ${status}`);
-    }
-    return schema.parse(payload);
+  async handle(params) {
+    // TODO: Implement domain logic here
+    // This is a placeholder that should be replaced with actual use case invocation
+    throw new Error('Handler not implemented: {{HANDLER_NAME}}');
   },
 };

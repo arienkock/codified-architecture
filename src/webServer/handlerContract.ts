@@ -1,4 +1,10 @@
-export interface HandlerContract {
+export interface HandlerContract<
+  TPathParams = any,
+  TQueryParams = any,
+  THeaderParams = any,
+  TRequestBody = any,
+  TResponse = any
+> {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTIONS' | 'HEAD' | 'TRACE';
   path: string;
   pathParamsSchema: any;
@@ -6,9 +12,14 @@ export interface HandlerContract {
   headerParamsSchema: any;
   requestBodySchema: any;
   responseSchemas: Record<string, any>;
-  parsePathParams(input: unknown): any;
-  parseQueryParams(input: unknown): any;
-  parseHeaderParams(input: unknown): any;
-  parseRequestBody(input: unknown): any;
-  parseResponse: any;
+  parsePathParams(input: unknown): TPathParams;
+  parseQueryParams(input: unknown): TQueryParams;
+  parseHeaderParams(input: unknown): THeaderParams;
+  parseRequestBody(input: unknown): TRequestBody;
+  handle(params: {
+    pathParams: TPathParams;
+    queryParams: TQueryParams;
+    headerParams: THeaderParams;
+    requestBody: TRequestBody;
+  }): Promise<TResponse>;
 }

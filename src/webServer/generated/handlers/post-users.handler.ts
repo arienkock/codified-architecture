@@ -4,8 +4,8 @@
  */
 
 import { z } from 'zod';
+import { HandlerContract } from '../../handlerContract.js';
 import * as DomainSeamTypes from '../../../domain-seam/types';
-import { HandlerContract } from '../../handlerContract';
 // Domain schemas are accessed via the namespace import inserted above.
 
 const pathParamsSchema = z.object({});
@@ -28,7 +28,16 @@ export type PostUsersHandlerResponseBodies = {
   "400": z.infer<(typeof responseSchemas)["400"]>;
 };
 
-export const postUsersHandler: HandlerContract = {
+// Discriminated union type for type-safe responses
+export type PostUsersHandlerResponse = { status: "201"; body: PostUsersHandlerResponseBodies["201"] } | { status: "400"; body: PostUsersHandlerResponseBodies["400"] };
+
+export const postUsersHandler: HandlerContract<
+  PostUsersHandlerPathParams,
+  PostUsersHandlerQueryParams,
+  PostUsersHandlerHeaderParams,
+  PostUsersHandlerRequestBody,
+  PostUsersHandlerResponse
+> = {
   method: 'POST' as const,
   path: '/users' as const,
   pathParamsSchema,
@@ -48,11 +57,30 @@ export const postUsersHandler: HandlerContract = {
   parseRequestBody(input: unknown) {
     return requestBodySchema.parse(input);
   },
-  parseResponse<TStatus extends keyof typeof responseSchemas>(status: TStatus, payload: unknown) {
-    const schema = responseSchemas[status];
-    if (!schema) {
-      throw new Error(`Unsupported status code: ${status}`);
-    }
-    return schema.parse(payload);
+  async handle(params) {
+    // TODO: Implement domain logic here
+    // This is a placeholder that should be replaced with actual use case invocation
+    
+    // Example: Return a 201 response with properly typed body
+    // TypeScript will enforce that the body matches UserCreateResponse schema
+    return {
+      status: "201" as const,
+      body: {
+        id: 1,
+        email: params.requestBody.email,
+        name: params.requestBody.name ?? null,  // Convert undefined to null to match schema
+        hashedPassword: "hashed_" + params.requestBody.password,
+      }
+    };
+    
+    // Example: If you wanted to return a 400 error instead:
+    // return {
+    //   status: "400" as const,
+    //   body: undefined  // TypeScript enforces this must be undefined for 400
+    // };
+    
+    // Note: If you try to return the wrong body type for a status code,
+    // TypeScript will show a compile error. For example, this would fail:
+    // return { status: "400", body: { id: 1 } };  // ERROR: body must be undefined for 400
   },
 };
