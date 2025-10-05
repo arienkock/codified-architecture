@@ -14,7 +14,7 @@ export type PostUsersHandlerResponse =
   | { status: "201"; body: UserCreateResponse }
   | { status: "400"; body: undefined };
 
-export async function handlePostUsersHandler(
+export async function handleRequest(
   params: PostUsersHandlerParams
 ): Promise<PostUsersHandlerResponse> {
   const { requestBody, requestContext } = params;

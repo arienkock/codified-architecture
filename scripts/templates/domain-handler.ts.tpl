@@ -58,14 +58,14 @@ export const {{HANDLER_VAR_NAME}}: HandlerContract<
   async handle(params) {
     // Convention-based domain handler invocation
     // Domain handler should be located at: src/domain/handlers/{{HANDLER_NAME}}.ts
-    // and export a function named: handle{{HANDLER_NAME}}
+    // and export a function named: handleRequest
     try {
       const domainHandler = await import('../../../domain/handlers/{{HANDLER_NAME}}.js');
-      const handlerFunction = domainHandler.handle{{HANDLER_NAME}};
+      const handlerFunction = domainHandler.handleRequest;
       
       if (typeof handlerFunction !== 'function') {
         throw new Error(
-          `Domain handler function 'handle{{HANDLER_NAME}}' not found in src/domain/handlers/{{HANDLER_NAME}}.ts`
+          `Domain handler function 'handleRequest' not found in src/domain/handlers/{{HANDLER_NAME}}.ts`
         );
       }
 
@@ -86,7 +86,7 @@ export const {{HANDLER_VAR_NAME}}: HandlerContract<
       if ((error as NodeJS.ErrnoException).code === 'ERR_MODULE_NOT_FOUND') {
         throw new Error(
           `Domain handler not implemented. Please create: src/domain/handlers/{{HANDLER_NAME}}.ts\n` +
-          `with an exported function: export async function handle{{HANDLER_NAME}}(params) { ... }`
+          `with an exported function: export async function handleRequest(params) { ... }`
         );
       }
       throw error;

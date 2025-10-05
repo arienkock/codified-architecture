@@ -10,12 +10,12 @@ Domain handlers are automatically invoked by generated web server handlers using
 
 For a generated handler named `PostUsersHandler`:
 - **File location**: `src/domain/handlers/PostUsersHandler.ts`
-- **Export name**: `handlePostUsersHandler`
+- **Export name**: `handleRequest`
 
 The pattern is:
 1. Handler name matches the PascalCase name from the generated handler
 2. File is located in `src/domain/handlers/`
-3. Exported function is named `handle{HandlerName}`
+3. Exported function is always named `handleRequest`
 
 ### Handler Signature
 
