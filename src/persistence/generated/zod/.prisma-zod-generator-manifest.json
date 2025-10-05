@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "generatorVersion": "1.0.0",
-  "generatedAt": "2025-10-05T15:09:51.239Z",
+  "generatedAt": "2025-10-05T15:26:58.880Z",
   "outputPath": "/workspaces/codified-architecture/src/persistence/generated/zod",
   "files": [
     "schemas/enums/TransactionIsolationLevel.schema.ts",
