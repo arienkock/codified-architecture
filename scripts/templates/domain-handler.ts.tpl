@@ -56,8 +56,40 @@ export const {{HANDLER_VAR_NAME}}: HandlerContract<
     return requestBodySchema.parse(input);
   },
   async handle(params) {
-    // TODO: Implement domain logic here
-    // This is a placeholder that should be replaced with actual use case invocation
-    throw new Error('Handler not implemented: {{HANDLER_NAME}}');
+    // Convention-based domain handler invocation
+    // Domain handler should be located at: src/domain/handlers/{{HANDLER_NAME}}.ts
+    // and export a function named: handle{{HANDLER_NAME}}
+    try {
+      const domainHandler = await import('../../../domain/handlers/{{HANDLER_NAME}}.js');
+      const handlerFunction = domainHandler.handle{{HANDLER_NAME}};
+      
+      if (typeof handlerFunction !== 'function') {
+        throw new Error(
+          `Domain handler function 'handle{{HANDLER_NAME}}' not found in src/domain/handlers/{{HANDLER_NAME}}.ts`
+        );
+      }
+
+      // Create a minimal request context
+      // TODO: Populate with actual app context from request
+      const requestContext = {
+        app: {}
+      };
+
+      return await handlerFunction({
+        pathParams: params.pathParams,
+        queryParams: params.queryParams,
+        headerParams: params.headerParams,
+        requestBody: params.requestBody,
+        requestContext,
+      });
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'ERR_MODULE_NOT_FOUND') {
+        throw new Error(
+          `Domain handler not implemented. Please create: src/domain/handlers/{{HANDLER_NAME}}.ts\n` +
+          `with an exported function: export async function handle{{HANDLER_NAME}}(params) { ... }`
+        );
+      }
+      throw error;
+    }
   },
 };

@@ -58,29 +58,40 @@ export const postUsersHandler: HandlerContract<
     return requestBodySchema.parse(input);
   },
   async handle(params) {
-    // TODO: Implement domain logic here
-    // This is a placeholder that should be replaced with actual use case invocation
-    
-    // Example: Return a 201 response with properly typed body
-    // TypeScript will enforce that the body matches UserCreateResponse schema
-    return {
-      status: "201" as const,
-      body: {
-        id: 1,
-        email: params.requestBody.email,
-        name: params.requestBody.name ?? null,  // Convert undefined to null to match schema
-        hashedPassword: "hashed_" + params.requestBody.password,
+    // Convention-based domain handler invocation
+    // Domain handler should be located at: src/domain/handlers/PostUsersHandler.ts
+    // and export a function named: handlePostUsersHandler
+    try {
+      const domainHandler = await import('../../../domain/handlers/PostUsersHandler.js');
+      const handlerFunction = domainHandler.handlePostUsersHandler;
+      
+      if (typeof handlerFunction !== 'function') {
+        throw new Error(
+          `Domain handler function 'handlePostUsersHandler' not found in src/domain/handlers/PostUsersHandler.ts`
+        );
       }
-    };
-    
-    // Example: If you wanted to return a 400 error instead:
-    // return {
-    //   status: "400" as const,
-    //   body: undefined  // TypeScript enforces this must be undefined for 400
-    // };
-    
-    // Note: If you try to return the wrong body type for a status code,
-    // TypeScript will show a compile error. For example, this would fail:
-    // return { status: "400", body: { id: 1 } };  // ERROR: body must be undefined for 400
+
+      // Create a minimal request context
+      // TODO: Populate with actual app context from request
+      const requestContext = {
+        app: {}
+      };
+
+      return await handlerFunction({
+        pathParams: params.pathParams,
+        queryParams: params.queryParams,
+        headerParams: params.headerParams,
+        requestBody: params.requestBody,
+        requestContext,
+      });
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'ERR_MODULE_NOT_FOUND') {
+        throw new Error(
+          `Domain handler not implemented. Please create: src/domain/handlers/PostUsersHandler.ts\n` +
+          `with an exported function: export async function handlePostUsersHandler(params) { ... }`
+        );
+      }
+      throw error;
+    }
   },
 };
