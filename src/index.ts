@@ -1,4 +1,4 @@
-import { createServer } from './webServer/server';
+import { createServer } from './webServer/server.js';
 
 async function main(): Promise<void> {
   const { app, logger } = createServer();

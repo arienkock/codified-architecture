@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { HandlerContract } from '../../handlerContract.js';
+import { HandlerContract } from '../../handlerContract';
 import * as DomainSeamTypes from '../../../domain-seam/types';
 // Domain schemas are accessed via the namespace import inserted above.
 
@@ -74,7 +74,7 @@ export const patchUsersIdHandler: HandlerContract<
     // Domain handler should be located at: src/domain/handlers/PatchUsersIdHandler.ts
     // and export a function named: handleRequest
     try {
-      const domainHandler = await import('../../../domain/handlers/PatchUsersIdHandler.js');
+      const domainHandler = await import('../../../domain/handlers/PatchUsersIdHandler');
       const handlerFunction = domainHandler.handleRequest;
       
       if (typeof handlerFunction !== 'function') {

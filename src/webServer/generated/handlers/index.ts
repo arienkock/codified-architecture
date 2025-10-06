@@ -1,2 +1,2 @@
-export * from './patch-users-id.handler.js';
-export * from './post-users.handler.js';
+export * from './patch-users-id.handler';
+export * from './post-users.handler';

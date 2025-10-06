@@ -180,7 +180,7 @@ const DOMAIN_SEAM_NAMESPACE = 'DomainSeamTypes';
   generatedFiles.sort((a, b) => a.handlerName.localeCompare(b.handlerName));
 
   const indexContent =
-    generatedFiles.map((entry) => `export * from './${entry.fileStem}.js';`).join('\n') +
+    generatedFiles.map((entry) => `export * from './${entry.fileStem}';`).join('\n') +
     (generatedFiles.length ? '\n' : '');
 
   await writeFile(path.join(outputDir, 'index.ts'), indexContent, 'utf8');

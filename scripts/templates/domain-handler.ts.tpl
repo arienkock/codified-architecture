@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { HandlerContract } from '../../handlerContract.js';
+import { HandlerContract } from '../../handlerContract';
 {{ADDITIONAL_IMPORTS}}
 // Domain schemas are accessed via the namespace import inserted above.
 
@@ -60,7 +60,7 @@ export const {{HANDLER_VAR_NAME}}: HandlerContract<
     // Domain handler should be located at: src/domain/handlers/{{HANDLER_NAME}}.ts
     // and export a function named: handleRequest
     try {
-      const domainHandler = await import('../../../domain/handlers/{{HANDLER_NAME}}.js');
+      const domainHandler = await import('../../../domain/handlers/{{HANDLER_NAME}}');
       const handlerFunction = domainHandler.handleRequest;
       
       if (typeof handlerFunction !== 'function') {

@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { HandlerContract } from '../../handlerContract.js';
+import { HandlerContract } from '../../handlerContract';
 import * as DomainSeamTypes from '../../../domain-seam/types';
 // Domain schemas are accessed via the namespace import inserted above.
 
@@ -70,7 +70,7 @@ export const postUsersHandler: HandlerContract<
     // Domain handler should be located at: src/domain/handlers/PostUsersHandler.ts
     // and export a function named: handleRequest
     try {
-      const domainHandler = await import('../../../domain/handlers/PostUsersHandler.js');
+      const domainHandler = await import('../../../domain/handlers/PostUsersHandler');
       const handlerFunction = domainHandler.handleRequest;
       
       if (typeof handlerFunction !== 'function') {

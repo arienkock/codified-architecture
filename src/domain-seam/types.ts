@@ -1,6 +1,6 @@
 import z from "zod";
 import { UserResultSchema, UserCreateInputObjectZodSchema, UserUncheckedUpdateInputObjectZodSchema } from "../persistence/generated/zod/schemas";
-import { wrapUseCaseResponse, ValidationErrorSchema, UseCaseResponseMetaSchema } from "../domain/useCases/types";
+import { wrapUseCaseResponse, ValidationErrorSchema, UseCaseResponseMetaSchema } from "../domain/handlers/types";
 
 export const UserCreateRequestSchema = UserCreateInputObjectZodSchema
     .omit({ hashedPassword: true })
