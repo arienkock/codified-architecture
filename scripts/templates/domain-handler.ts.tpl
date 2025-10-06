@@ -69,10 +69,9 @@ export const {{HANDLER_VAR_NAME}}: HandlerContract<
         );
       }
 
-      // Create a minimal request context
-      // TODO: Populate with actual app context from request
+      // Create request context with the app context
       const requestContext = {
-        app: {}
+        app: params.appContext
       };
 
       return await handlerFunction({

@@ -8,6 +8,7 @@ import express, {
 import pino from 'pino';
 import pinoHttp from 'pino-http';
 import { registerGeneratedHandlers } from './registerHandlers.js';
+import type { AppContext } from '../AppContext.js';
 
 export interface ServerOptions {
   /**
@@ -18,6 +19,10 @@ export interface ServerOptions {
    * Optional array of additional middleware that should run before routing.
    */
   middleware?: RequestHandler[];
+  /**
+   * Application context containing shared resources like database clients.
+   */
+  appContext: AppContext;
 }
 
 export interface ServerInstance {
@@ -25,7 +30,7 @@ export interface ServerInstance {
   logger: pino.Logger;
 }
 
-export function createServer(options: ServerOptions = {}): ServerInstance {
+export function createServer(options: ServerOptions): ServerInstance {
   const transport =
     process.env.NODE_ENV === 'development'
       ? {
@@ -71,7 +76,7 @@ export function createServer(options: ServerOptions = {}): ServerInstance {
   });
 
   // Register generated handlers dynamically
-  registerGeneratedHandlers(app, logger);
+  registerGeneratedHandlers(app, logger, options.appContext);
 
   app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
     logger.error({ err }, 'Unhandled error');

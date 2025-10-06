@@ -1,3 +1,5 @@
+import type { AppContext } from '../AppContext.js';
+
 export interface HandlerContract<
   TPathParams = any,
   TQueryParams = any,
@@ -21,5 +23,6 @@ export interface HandlerContract<
     queryParams: TQueryParams;
     headerParams: THeaderParams;
     requestBody: TRequestBody;
+    appContext: AppContext;
   }): Promise<TResponse>;
 }

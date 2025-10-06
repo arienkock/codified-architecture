@@ -2,28 +2,29 @@ import { Express, Request, Response, NextFunction } from 'express';
 import pino from 'pino';
 import * as handlers from './generated/handlers/index.js';
 import { HandlerContract } from './handlerContract.js';
+import type { AppContext } from '../AppContext.js';
 
-export function registerGeneratedHandlers(app: Express, logger: pino.Logger): void {
+export function registerGeneratedHandlers(app: Express, logger: pino.Logger, appContext: AppContext): void {
   // Get all exported values from the generated handlers
   const exportedValues = Object.values(handlers);
 
   logger.info({ count: exportedValues.length }, 'Registering generated handlers');
 
   for (const handler of exportedValues) {
-    registerHandler(app, handler, logger);
+    registerHandler(app, handler, logger, appContext);
   }
 }
 
-function registerHandler(app: Express, handler: HandlerContract, logger: pino.Logger): void {
+function registerHandler(app: Express, handler: HandlerContract, logger: pino.Logger, appContext: AppContext): void {
   const method = handler.method.toLowerCase() as keyof Express;
   const path = handler.path;
 
   logger.debug({ method: handler.method, path }, 'Registering handler');
 
-  app[method](path, createHandlerMiddleware(handler, logger));
+  app[method](path, createHandlerMiddleware(handler, logger, appContext));
 }
 
-function createHandlerMiddleware(handler: HandlerContract, logger: pino.Logger) {
+function createHandlerMiddleware(handler: HandlerContract, logger: pino.Logger, appContext: AppContext) {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       // Parse and validate path parameters
@@ -44,6 +45,7 @@ function createHandlerMiddleware(handler: HandlerContract, logger: pino.Logger) 
         queryParams,
         headerParams,
         requestBody,
+        appContext,
       });
 
       // Send the response - TypeScript ensures the body matches the status code schema

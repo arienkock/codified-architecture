@@ -1,9 +1,8 @@
 
 import { z } from "zod";
+import type { AppContext } from "../../AppContext.js";
 
-export interface AppContext {
-
-}
+export type { AppContext };
 
 export interface RequestContext {
     app: AppContext,
