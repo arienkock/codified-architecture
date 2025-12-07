@@ -129,7 +129,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/workspaces/codified-architecture/src/persistence/generated/prisma",
+      "value": "/Users/arienkock/Development/codified-architecture/src/persistence/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -138,12 +138,12 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "debian-openssl-3.0.x",
+        "value": "darwin",
         "native": true
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/workspaces/codified-architecture/prisma/schema.prisma",
+    "sourceFilePath": "/Users/arienkock/Development/codified-architecture/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {

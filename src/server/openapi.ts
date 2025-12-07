@@ -1,0 +1,130 @@
+import z from "zod";
+import { createDocument, ZodOpenApiOperationObject, ZodOpenApiPathItemObject } from "zod-openapi";
+import { ResourceDefinition } from "../common/resource-definition.js";
+import { createPagenatedResponseSchema } from "../common/pagination.js";
+
+import userResourceDefinition from "../services/handlers/user.js";
+
+const document: ReturnType<typeof createDocument> = createDocument({
+    openapi: "3.0.0",
+    info: {
+        title: "Codified Architecture",
+        version: "1.0.0",
+    },
+    paths: {
+        [`/${userResourceDefinition.namePlural}`]: CollectionResourcePaths(userResourceDefinition),
+        [`/${userResourceDefinition.namePlural}/{id}`]: SingleResourcePaths(userResourceDefinition),
+    },
+});
+
+
+function CollectionResourcePaths(resourceDefinition: ResourceDefinition): ZodOpenApiPathItemObject {
+    return {
+        post: CreateResourcePath(resourceDefinition),
+        get: ReadCollectionResourcePath(resourceDefinition),
+    }
+}
+
+function SingleResourcePaths(resourceDefinition: ResourceDefinition): ZodOpenApiPathItemObject {
+    return {
+        get: ReadResourcePath(resourceDefinition),
+        put: UpdateResourcePath(resourceDefinition),
+        delete: DeleteResourcePath(resourceDefinition),
+    }
+}
+
+function ReadResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiOperationObject {
+    return {
+        summary: `Get a ${resourceDefinition.name} by ID`,
+        responses: {
+            200: {
+                description: "OK",
+                content: {
+                    "application/json": {
+                        schema: resourceDefinition.readResponseSchema,
+                    }
+                }
+            }
+        }
+    } satisfies ZodOpenApiOperationObject;
+}
+
+function UpdateResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiOperationObject {
+    return {
+        summary: `Update a ${resourceDefinition.name} by ID`,
+        requestBody: {
+            content: {
+                "application/json": {
+                    schema: resourceDefinition.updateRequestBodySchema,
+                }
+            }
+        },
+        responses: {
+            200: {
+                description: "OK",
+                content: {
+                    "application/json": {
+                        schema: resourceDefinition.readResponseSchema,
+                    }
+                }
+            }
+        }
+    } satisfies ZodOpenApiOperationObject;
+}
+
+function DeleteResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiOperationObject {
+    return {
+        summary: `Delete a ${resourceDefinition.name} by ID`,
+        responses: {
+            200: {
+                description: "OK",
+                content: {
+                    "application/json": {
+                        schema: resourceDefinition.readResponseSchema,
+                    }
+                }
+            }
+        }
+    } satisfies ZodOpenApiOperationObject;
+}
+
+function CreateResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiOperationObject {
+    return {
+        summary: `Create a new ${resourceDefinition.name}`,
+        requestBody: {
+            content: {
+                "application/json": {
+                    schema: resourceDefinition.createRequestBodySchema,
+                }
+            }
+        },
+        responses: {
+            201: {
+                description: "Created",
+                content: {
+                    "application/json": {
+                        schema: resourceDefinition.readResponseSchema,
+                    }
+                }
+            }
+        }
+    } satisfies ZodOpenApiOperationObject;
+}
+
+function ReadCollectionResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiOperationObject {
+    return {
+        summary: `Get all ${resourceDefinition.namePlural}`,
+        responses: {
+            200: {
+                description: "OK",
+                content: {
+                    "application/json": {
+                        schema: createPagenatedResponseSchema(resourceDefinition.readResponseSchema),
+                    }
+                }
+            }
+        }
+    } satisfies ZodOpenApiOperationObject;
+}
+
+export default document;

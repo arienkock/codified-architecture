@@ -5,11 +5,11 @@
   "main": "index.js",
   "scripts": {
     "codegen": "npm run generate",
-    "generate": "npm run generate:prisma && npm run generate:openapi && npm run generate:domain-handlers",
+    "generate": "npm run generate:prisma",
     "build": "npm run codegen && tsc",
     "generate:prisma": "prisma generate",
-    "generate:openapi": "tsx scripts/generate-openapi-json.ts",
-    "generate:domain-handlers": "tsx scripts/generate-openapi-handlers.ts"
+    "start": "npm run build && node dist/index.js",
+    "dev": "tsx watch src/index.ts"
   },
   "keywords": [],
   "author": "",
