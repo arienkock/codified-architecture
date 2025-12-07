@@ -1,6 +1,6 @@
 import z from "zod";
 import { ResourceDefinition } from "../../common/resource-definition.js"
-import { UserCreateInputObjectZodSchema, UserUpdateInputObjectZodSchema } from "../../persistence/generated/zod/schemas";
+import { UserCreateInputObjectZodSchema, UserUpdateInputObjectZodSchema } from "../../persistence/generated/zod/schemas/index.js";
 import { UserSelectObjectZodSchema } from "../../persistence/generated/zod/schemas/objects/UserSelect.schema.js";
 
 const internalFields: Record<string, true> = {
