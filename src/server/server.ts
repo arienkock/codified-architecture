@@ -1,13 +1,16 @@
 import express from "express";
-import z from "zod";
 import document from "./openapi.js";
-import { Prisma, PrismaClient } from "../persistence/generated/prisma/client.js";
+import { PrismaClient } from "../persistence/generated/prisma/client.js";
 import userResourceDefinition from "../services/handlers/user.js";
-import { PagenatedResponse, paginationParamsSchema } from "../common/pagination.js";
-import { DEFAULT_PAGE_SIZE } from "../config.js";
-import { ResourceDefinition } from "../common/resource-definition.js";
-import { DefaultArgs } from "../persistence/generated/prisma/runtime/library";
+import { createCRUDRoutes } from "./createCRUDRoutes.js";
+import { SecurityContext } from "../common/security.js";
+import * as jose from 'jose'
+import { JWT_SECRET } from "../config.js";
+import cookieParser from "cookie-parser";
 
+const secret = new TextEncoder().encode(
+    JWT_SECRET
+)
 
 export function createServer(db: PrismaClient, port?: number) {
     const app = express();
@@ -16,61 +19,61 @@ export function createServer(db: PrismaClient, port?: number) {
 
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
+    app.use(cookieParser());
     app.get("/openapi.json", (req, res) => {
         res.json(document);
     });
     setupRoutes(app, db);
+    if(process.env.NODE_ENV === 'development') {
+        setupDevRoutes(app);
+    }
     const server = app.listen(port, () => {
         console.log(`Server is running on port ${port}`);
     });
     return server;
 }
 
+function setupDevRoutes(app: express.Application) {
+    app.get('/dev/login', async (req: express.Request, res: express.Response) => {
+        res.cookie('session', await new jose.SignJWT({ userId: 1 }).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().setExpirationTime('1h').sign(secret), { httpOnly: true, secure: false });
+        res.redirect('/');
+    });
+    app.get('/dev/logout', (req: express.Request, res: express.Response) => {
+        res.clearCookie('session');
+        res.redirect('/');
+    });
+    app.get('/dev/loginAsAdmin', async (req: express.Request, res: express.Response) => {
+        res.cookie('session', await new jose.SignJWT({ userId: 1, isAdmin: true }).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().setExpirationTime('1h').sign(secret), { httpOnly: true, secure: false });
+        res.redirect('/');
+    });
+}
+
 function setupRoutes(app: express.Application, db: PrismaClient) {
+    app.use(securityContextMiddleware)
     app.use(`/${userResourceDefinition.namePlural}`, createCRUDRoutes(db, db.user, userResourceDefinition));
 }
 
-function createCRUDRoutes(db: PrismaClient, repo: Prisma.UserDelegate<DefaultArgs>, resourceDefinition: ResourceDefinition) {
-    const router = express.Router();
-    router.get("/", (req, res) => {
-        const paginationParams = paginationParamsSchema.parse(req.query);
-        const page = paginationParams.page ?? 0;
-        const pageSize = paginationParams.pageSize ?? DEFAULT_PAGE_SIZE;
-        return db.$transaction([
-            repo.findMany({
-                skip: page * pageSize,
-                take: pageSize,
-            }),
-            repo.count(),
-        ]).then(([users, total]) => {
-            const totalPages = Math.ceil(total / pageSize);
-            res.json({
-                data: users.map(u => resourceDefinition.readResponseSchema.parse(u)),
-                pagination: {
-                    page,
-                    pageSize,
-                    total,
-                    totalPages,
-                    hasNext: page < totalPages - 1,
-                    hasPrev: page > 0,
-                },
-            } satisfies PagenatedResponse<z.infer<typeof resourceDefinition.readResponseSchema>>);
-        });
-    });
-    router.post("/", (req, res) => {
-        const body: z.infer<typeof resourceDefinition.createRequestBodySchema> = resourceDefinition.createRequestBodySchema.parse(req.body);
-        return repo.create({
-            data: body as any,
-        }).then(u => res.json(resourceDefinition.readResponseSchema.parse(u)));
-    });
-    router.get("/:id", (req, res) => {
-        res.json({ message: "Hello, world!" });
-    });
-    router.put("/:id", (req, res) => {
-        res.json({ message: "Hello, world!" });
-    });
-    router.delete("/:id", (req, res) => {
-        res.json({ message: "Hello, world!" });
-    });
-    return router;
+declare module 'express-serve-static-core' {
+    interface Request {
+        securityContext: SecurityContext;
+    }
+}
+
+// TODO: Use cookie parser to use signed cookies.
+async function securityContextMiddleware(req: express.Request, res: express.Response, next: express.NextFunction) {
+    const securityContext: SecurityContext = await parseSessionCookie(req.cookies?.session ?? '');
+    req.securityContext = securityContext;
+    return next();
+}
+
+async function parseSessionCookie(sessionCookie: string): Promise<any> {
+    try {
+        const { payload } = await jose.jwtVerify(sessionCookie, secret)
+        return {
+            currentUserId: parseInt(payload.userId as string),
+            isAdmin: payload.isAdmin as boolean,
+        };
+    } catch (error) {
+        return {};
+    }
 }

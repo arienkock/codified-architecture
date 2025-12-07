@@ -1,9 +1,40 @@
 import z from "zod";
+import { SecurityFilterGenerator } from "./security";
 
 export interface ResourceDefinition {
     name: string;
     namePlural: string;
-    createRequestBodySchema: z.ZodSchema;
-    readResponseSchema: z.ZodSchema;
-    updateRequestBodySchema: z.ZodSchema;
+    create: {
+        requestBodySchema: z.ZodSchema;
+        requestBodyTransformer?: Transformer;
+        validators: Validator[];
+        authorizers: Authorizer[];
+    };
+    read: {
+        requestParamsSchema: z.ZodSchema;
+        responseSchema: z.ZodSchema;
+        securityFilterGenerator: SecurityFilterGenerator;
+        authorizers: Authorizer[];
+    };
+    update: {
+        requestBodySchema: z.ZodSchema;
+        validators: Validator[];
+        authorizers: Authorizer[];
+    };
+    delete: {
+        authorizers: Authorizer[];
+        validators: Validator[];
+    };
+}
+
+export interface Validator {
+    (): void
+}
+
+export interface Authorizer {
+    (): void
+}
+
+export interface Transformer {
+    (input: any): any
 }

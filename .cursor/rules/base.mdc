@@ -1,3 +1,11 @@
 ---
 alwaysApply: true
 ---
+
+This is a boilerplate project that tries to codify architecture and best-practices using static typing and code generation.
+
+All results of code generation should live in a subdirectory of the architecture layer: `src/{layer}/generated`.
+
+The primary code generation command is `npm run codegen`.
+
+When handlers need to do multiple write actions to the database (using the prisma client), the operation must be wrapped in a transaction.

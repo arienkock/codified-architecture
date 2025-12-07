@@ -41,7 +41,7 @@ function ReadResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiOpe
                 description: "OK",
                 content: {
                     "application/json": {
-                        schema: resourceDefinition.readResponseSchema,
+                        schema: resourceDefinition.read.responseSchema,
                     }
                 }
             }
@@ -55,7 +55,7 @@ function UpdateResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiO
         requestBody: {
             content: {
                 "application/json": {
-                    schema: resourceDefinition.updateRequestBodySchema,
+                    schema: resourceDefinition.update.requestBodySchema,
                 }
             }
         },
@@ -64,7 +64,7 @@ function UpdateResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiO
                 description: "OK",
                 content: {
                     "application/json": {
-                        schema: resourceDefinition.readResponseSchema,
+                        schema: resourceDefinition.read.responseSchema,
                     }
                 }
             }
@@ -80,7 +80,7 @@ function DeleteResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiO
                 description: "OK",
                 content: {
                     "application/json": {
-                        schema: resourceDefinition.readResponseSchema,
+                        schema: resourceDefinition.read.responseSchema,
                     }
                 }
             }
@@ -94,7 +94,7 @@ function CreateResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiO
         requestBody: {
             content: {
                 "application/json": {
-                    schema: resourceDefinition.createRequestBodySchema,
+                    schema: resourceDefinition.create.requestBodySchema,
                 }
             }
         },
@@ -103,7 +103,7 @@ function CreateResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiO
                 description: "Created",
                 content: {
                     "application/json": {
-                        schema: resourceDefinition.readResponseSchema,
+                        schema: resourceDefinition.read.responseSchema,
                     }
                 }
             }
@@ -119,7 +119,7 @@ function ReadCollectionResourcePath(resourceDefinition: ResourceDefinition): Zod
                 description: "OK",
                 content: {
                     "application/json": {
-                        schema: createPagenatedResponseSchema(resourceDefinition.readResponseSchema),
+                        schema: createPagenatedResponseSchema(resourceDefinition.read.responseSchema),
                     }
                 }
             }
