@@ -188,5 +188,23 @@ describe('User API', () => {
       .ok(res => res.status === 404)
       .set('content-type', 'application/json');
   });
+
+  it('returns 400 when trying to update user with a non-existent field', async () => {
+    const agent = testRequest.agent();
+    const user = await agent
+      .post(`${baseUrl}/users`)
+      .send({ email: 'api-user6@example.com', name: 'API User 6', password: 'supersafe123' })
+      .set('content-type', 'application/json');
+    // login as admin
+    await agent
+      .get(`${baseUrl}/dev/loginAsUser?userId=1&isAdmin=true`)
+      .set('content-type', 'application/json');
+    const updated = await agent
+      .put(`${baseUrl}/users/${user.body.id}`)
+      .ok(res => res.status === 400)
+      .send({ email: 'api-user6-updated@example.com', name: 'API User 6 Updated', nonExistentField: 'test' })
+      .set('content-type', 'application/json');
+    expect(updated.body.errors).toBeDefined();
+  });
 });
 
