@@ -21,6 +21,8 @@ const config: Config = {
   transformIgnorePatterns: [],
   globalSetup: '<rootDir>/tests/utils/globalSetup.ts',
   globalTeardown: '<rootDir>/tests/utils/globalTeardown.ts',
+  setupFilesAfterEnv: ['<rootDir>/tests/utils/jest-setup.ts'],
+  snapshotSerializers: ['<rootDir>/tests/utils/jest-circular-serializer.ts'],
 };
 
 export default config;
