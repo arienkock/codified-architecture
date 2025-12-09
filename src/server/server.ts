@@ -15,7 +15,7 @@ const secret = new TextEncoder().encode(
 export function createServer(db: PrismaClient, port?: number) {
     const app = express();
 
-    port = port || Number(process.env.PORT) || 3000;
+    const resolvedPort = port ?? (process.env.PORT ? Number(process.env.PORT) : undefined) ?? 3000;
 
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
@@ -27,8 +27,9 @@ export function createServer(db: PrismaClient, port?: number) {
     if(process.env.NODE_ENV === 'development') {
         setupDevRoutes(app);
     }
-    const server = app.listen(port, () => {
-        console.log(`Server is running on port ${port}`);
+    const server = app.listen(resolvedPort, () => {
+        const actualPort = (server.address() as { port: number })?.port ?? resolvedPort;
+        console.log(`Server is running on port ${actualPort}`);
     });
     return server;
 }
