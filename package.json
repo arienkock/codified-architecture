@@ -11,6 +11,7 @@
     "generate:prisma": "prisma generate",
     "start": "tsx src/index.js",
     "dev": "NODE_ENV=development tsx watch src/index.ts",
+    "test": "jest",
     "db:start": "docker run -d --name codified-architecture-db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=codified_architecture -p 5432:5432 -v codified-architecture-postgres-data:/var/lib/postgresql/data --restart unless-stopped postgres:16-alpine || docker start codified-architecture-db",
     "db:stop": "docker stop codified-architecture-db",
     "db:restart": "docker restart codified-architecture-db",
@@ -33,11 +34,14 @@
     "zod-openapi": "^5.4.2"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.12",
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.0",
     "@types/node": "^24.5.2",
+    "jest": "^29.7.0",
     "prisma": "^6.16.2",
     "prisma-zod-generator": "^1.22.2",
+    "ts-jest": "^29.2.3",
     "tsx": "^4.19.2"
   }
 }
