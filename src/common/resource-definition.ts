@@ -18,11 +18,14 @@ export interface ResourceDefinition {
     };
     update: {
         requestBodySchema: z.ZodSchema;
+        requestParamsSchema: z.ZodSchema;
+        securityFilterGenerator: SecurityFilterGenerator;
         validators: Validator[];
         authorizers: Authorizer[];
     };
     delete: {
         authorizers: Authorizer[];
+        securityFilterGenerator: SecurityFilterGenerator;
         validators: Validator[];
     };
 }
