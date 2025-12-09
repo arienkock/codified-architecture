@@ -41,6 +41,7 @@
     "jest": "^29.7.0",
     "prisma": "^6.16.2",
     "prisma-zod-generator": "^1.22.2",
+    "ts-node": "^10.9.2",
     "ts-jest": "^29.2.3",
     "tsx": "^4.19.2"
   }
