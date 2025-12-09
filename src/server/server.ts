@@ -23,8 +23,11 @@ export function createServer(db: PrismaClient, port?: number) {
     app.get("/openapi.json", (req, res) => {
         res.json(document);
     });
+    app.get('/', (req, res) => {
+        res.send('//TODO: Add a welcome page');
+    });
     setupRoutes(app, db);
-    if(process.env.NODE_ENV === 'development') {
+    if(process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
         setupDevRoutes(app);
     }
     const server = app.listen(resolvedPort, () => {
@@ -35,8 +38,8 @@ export function createServer(db: PrismaClient, port?: number) {
 }
 
 function setupDevRoutes(app: express.Application) {
-    app.get('/dev/login', async (req: express.Request, res: express.Response) => {
-        res.cookie('session', await new jose.SignJWT({ userId: 1 }).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().setExpirationTime('1h').sign(secret), { httpOnly: true, secure: false });
+    app.get('/dev/loginAsUser', async (req: express.Request, res: express.Response) => {
+        res.cookie('session', await new jose.SignJWT({ userId: req.query.userId as string }).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().setExpirationTime('1h').sign(secret), { httpOnly: true, secure: false });
         res.redirect('/');
     });
     app.get('/dev/logout', (req: express.Request, res: express.Response) => {

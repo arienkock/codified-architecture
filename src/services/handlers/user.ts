@@ -21,18 +21,24 @@ const userResourceDefinition: ResourceDefinition = {
         responseSchema: UserCreateResultSchema.omit(internalFields),
         requestParamsSchema: z.object({ id: z.coerce.number().int() }),
         securityFilterGenerator: securityFilterGenerator,
-        authorizers: [],
+        authorizers: [
+            authenticationRequiredAuthorizer,
+        ],
     },
     update: {
         requestBodySchema: UserUpdateInputObjectZodSchema.omit(internalFields).extend({ password: z.string() }).strict(),
         securityFilterGenerator: securityFilterGenerator,
         requestParamsSchema: z.object({ id: z.coerce.number().int() }),
         validators: [],
-        authorizers: [],
+        authorizers: [
+            authenticationRequiredAuthorizer,
+        ],
     },
     delete: {
         securityFilterGenerator: securityFilterGenerator,
-        authorizers: [],
+        authorizers: [
+            authenticationRequiredAuthorizer,
+        ],
         validators: [],
     },
 }
@@ -52,10 +58,14 @@ function securityFilterGenerator(securityContext: SecurityContext, requestParams
     if (securityContext.isAdmin) {
         return {};
     }
-    if (!securityContext.currentUserId) {
-        return {};
-    }
     return {
         id: securityContext.currentUserId,
     };
+}
+
+function authenticationRequiredAuthorizer(securityContext: SecurityContext): Promise<void> {
+    if (!securityContext.currentUserId) {
+        throw new Error('Authentication required');
+    }
+    return Promise.resolve();
 }

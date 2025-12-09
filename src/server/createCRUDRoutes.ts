@@ -8,7 +8,12 @@ import { GenericErrorResponse } from "../common/errors";
 
 export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition: ResourceDefinition) {
     const router = express.Router();
-    router.get("/", (req, res) => {
+    router.get("/", async (req, res) => {
+        try {
+            await Promise.all(resourceDefinition.read.authorizers.map((authorizer) => authorizer(req.securityContext)));
+        } catch (error) {
+            return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);
+        }
         const paginationParams = paginationParamsSchema.parse(req.query);
         const page = paginationParams.page ?? 0;
         const pageSize = paginationParams.pageSize ?? DEFAULT_PAGE_SIZE;
@@ -35,7 +40,12 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
             } satisfies PagenatedResponse<z.infer<typeof resourceDefinition.read.responseSchema>>);
         });
     });
-    router.post("/", (req, res) => {
+    router.post("/", async (req, res) => {
+        try {
+            await Promise.all(resourceDefinition.create.authorizers.map((authorizer) => authorizer(req.securityContext)));
+        } catch (error) {
+            return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);
+        }
         let body: z.infer<typeof resourceDefinition.create.requestBodySchema>;
         try {
             body = resourceDefinition.create.requestBodySchema.parse(req.body);
@@ -57,7 +67,12 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
                 return res.status(500).json({ message: "Internal server error" } satisfies GenericErrorResponse);
             });
     });
-    router.get("/:id", (req, res) => {
+    router.get("/:id", async (req, res) => {
+        try {
+            await Promise.all(resourceDefinition.read.authorizers.map((authorizer) => authorizer(req.securityContext)));
+        } catch (error) {
+            return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);
+        }
         let requestParams: any;
         let securityFilter: any;
         try {
@@ -88,7 +103,13 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
             return res.status(500).json({ message: "Internal server error" } satisfies GenericErrorResponse);
         });
     });
-    router.put("/:id", (req, res) => {
+    router.put("/:id", async (req, res) => {
+        try {
+            await Promise.all(resourceDefinition.update.authorizers.map((authorizer) => authorizer(req.securityContext)));
+        } catch (error) {
+            return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);
+        }
+
         let data: z.infer<typeof resourceDefinition.update.requestBodySchema>;
         let requestParams: any;
         let securityFilter: any;

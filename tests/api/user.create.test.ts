@@ -25,8 +25,8 @@ describe('User API - create', () => {
     const email = 'api-user@example.com';
     const name = 'API User';
     const password = 'supersafe123';
-
-    const res = await request
+    const agent = request.agent();
+    const res = await agent
       .post(`${baseUrl}/users`)
       .send({ email, name, password })
       .set('content-type', 'application/json');
@@ -41,6 +41,18 @@ describe('User API - create', () => {
     expect(persisted?.email).toBe(email);
     expect(persisted?.hashedPassword).toBeDefined();
     expect(persisted?.hashedPassword).not.toBe(password);
+
+    // login as user
+    await agent
+      .get(`${baseUrl}/dev/loginAsUser?userId=${res.body.id}`)
+      .set('content-type', 'application/json');
+      
+    // get user by id from api and verify the password is not returned
+    const user = await agent
+      .get(`${baseUrl}/users/${res.body.id}`)
+      .set('content-type', 'application/json');
+    expect(user.body.email).toBe(email);
+    expect(user.body.hashedPassword).toBeUndefined();
   });
 
   it('returns validation errors for missing and invalid fields', async () => {

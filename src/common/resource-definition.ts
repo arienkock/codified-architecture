@@ -1,5 +1,5 @@
 import z from "zod";
-import { SecurityFilterGenerator } from "./security";
+import { SecurityContext, SecurityFilterGenerator } from "./security";
 
 export interface ResourceDefinition {
     name: string;
@@ -35,7 +35,7 @@ export interface Validator {
 }
 
 export interface Authorizer {
-    (): void
+    (securityContext: SecurityContext): Promise<void>
 }
 
 export interface Transformer {
