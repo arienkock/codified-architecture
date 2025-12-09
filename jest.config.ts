@@ -21,8 +21,15 @@ const config: Config = {
   transformIgnorePatterns: [],
   globalSetup: '<rootDir>/tests/utils/globalSetup.ts',
   globalTeardown: '<rootDir>/tests/utils/globalTeardown.ts',
-  setupFilesAfterEnv: ['<rootDir>/tests/utils/jest-setup.ts'],
-  snapshotSerializers: ['<rootDir>/tests/utils/jest-circular-serializer.ts'],
+  // Improve stack trace display
+  errorOnDeprecated: true,
+  // Show more detailed error information
+  verbose: false,
+  // Better error formatting
+  displayName: {
+    name: 'codified-architecture',
+    color: 'blue',
+  },
 };
 
 export default config;

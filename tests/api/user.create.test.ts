@@ -1,5 +1,5 @@
 import { describe, expect, it, afterAll, beforeAll } from '@jest/globals';
-import request from 'superagent';
+import { testRequest } from '../utils/test-request.js';
 import { AddressInfo } from 'net';
 import { PrismaClient } from '../../src/persistence/generated/prisma/index.js';
 import { createServer } from '../../src/server/server.js';
@@ -25,7 +25,7 @@ describe('User API - create', () => {
     const email = 'api-user@example.com';
     const name = 'API User';
     const password = 'supersafe123';
-    const agent = request.agent();
+    const agent = testRequest.agent();
     const res = await agent
       .post(`${baseUrl}/users`)
       .send({ email, name, password })
@@ -56,7 +56,7 @@ describe('User API - create', () => {
   });
 
   it('returns validation errors for missing and invalid fields', async () => {
-    const res = await request
+    const res = await testRequest
       .post(`${baseUrl}/users`)
       .ok(res => res.status === 400)
       .send({ email: 'invalid-email' })
@@ -73,7 +73,7 @@ describe('User API - create', () => {
     const email = 'api-user3@example.com';
     const name = 'API User';
     const password = 'supersafe123';
-    const agent = request.agent();
+    const agent = testRequest.agent();
     const authUser = await agent
       .post(`${baseUrl}/users`)
       .send({ email, name, password })
@@ -111,6 +111,25 @@ describe('User API - create', () => {
       .get(`${baseUrl}/users`)
       .set('content-type', 'application/json');
     expect(usersAsAdmin.body.data.length).toBeGreaterThan(1);
+  });
+
+  it('requires authenication all endpoints except creation', async () => {
+    const res = await testRequest
+      .get(`${baseUrl}/users`)
+      .ok(res => res.status === 401)
+      .set('content-type', 'application/json');
+    const res2 = await testRequest
+      .get(`${baseUrl}/users/1`)
+      .ok(res => res.status === 401)
+      .set('content-type', 'application/json');
+    const res3 = await testRequest
+      .put(`${baseUrl}/users/1`)
+      .ok(res => res.status === 401)
+      .set('content-type', 'application/json');
+    const res4 = await testRequest
+      .delete(`${baseUrl}/users/1`)
+      .ok(res => res.status === 401)
+      .set('content-type', 'application/json');
   });
 });
 
