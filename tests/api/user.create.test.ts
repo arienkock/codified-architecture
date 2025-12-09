@@ -3,7 +3,6 @@ import request from 'superagent';
 import { AddressInfo } from 'net';
 import { PrismaClient } from '../../src/persistence/generated/prisma/index.js';
 import { createServer } from '../../src/server/server.js';
-import { getTestDatabaseUrl } from '../utils/test-db.js';
 
 describe('User API - create', () => {
   let server: ReturnType<typeof createServer>;
@@ -11,7 +10,6 @@ describe('User API - create', () => {
   let db: PrismaClient;
 
   beforeAll(async () => {
-    process.env.DATABASE_URL = getTestDatabaseUrl();
     db = new PrismaClient();
     server = createServer(db, 0);
     const address = server.address() as AddressInfo;
@@ -29,7 +27,7 @@ describe('User API - create', () => {
     const password = 'supersafe123';
 
     const res = await request
-      .post(`${baseUrl}/Users`)
+      .post(`${baseUrl}/users`)
       .send({ email, name, password })
       .set('content-type', 'application/json');
 
@@ -43,6 +41,19 @@ describe('User API - create', () => {
     expect(persisted?.email).toBe(email);
     expect(persisted?.hashedPassword).toBeDefined();
     expect(persisted?.hashedPassword).not.toBe(password);
+  });
+
+  it('returns validation errors for missing and invalid fields', async () => {
+    const res = await request
+      .post(`${baseUrl}/users`)
+      .ok(res => res.status === 400)
+      .send({ email: 'invalid-email' })
+      .set('content-type', 'application/json');
+
+    expect(res.status).toBe(400);
+    expect(res.body.errors).toBeDefined();
+    const messages = (res.body.errors ?? []).map((e: any) => e.message);
+    expect(messages).toEqual(expect.arrayContaining(["Invalid input: expected string, received undefined"]));
   });
 });
 

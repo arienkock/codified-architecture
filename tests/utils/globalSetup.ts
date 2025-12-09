@@ -1,9 +1,8 @@
 import { applyMigrations, dropTestDatabase, getTestDatabaseUrl } from './test-db';
 
 export default async function globalSetup() {
-  const dbUrl = getTestDatabaseUrl();
-  process.env.DATABASE_URL = dbUrl;
-  await dropTestDatabase(dbUrl);
-  applyMigrations(dbUrl);
+  process.env.DATABASE_URL = getTestDatabaseUrl();
+  await dropTestDatabase();
+  applyMigrations();
 }
 

@@ -1,8 +1,6 @@
-import { dropTestDatabase, getTestDatabaseUrl } from './test-db';
+import { dropTestDatabase } from './test-db';
 
 export default async function globalTeardown() {
-  const dbUrl = getTestDatabaseUrl();
-  process.env.DATABASE_URL = dbUrl;
-  await dropTestDatabase(dbUrl);
+  await dropTestDatabase();
 }
 

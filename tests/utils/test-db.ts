@@ -17,11 +17,11 @@ export function getTestDatabaseName(): string {
   return url.pathname.slice(1); // Remove leading '/'
 }
 
-export async function dropTestDatabase(dbUrl = getTestDatabaseUrl()) {
+export async function dropTestDatabase() {
   const dbName = getTestDatabaseName();
 
   // Connect to postgres database (not the test database) to drop/create the test database
-  const url = new URL(dbUrl);
+  const url = new URL(getTestDatabaseUrl());
   url.pathname = '/postgres';
   const postgresUrl = url.toString();
   
