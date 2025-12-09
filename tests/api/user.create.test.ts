@@ -67,5 +67,50 @@ describe('User API - create', () => {
     const messages = (res.body.errors ?? []).map((e: any) => e.message);
     expect(messages).toEqual(expect.arrayContaining(["Invalid input: expected string, received undefined"]));
   });
+
+  it('does not show other users to unauthorized users', async () => {
+    // register a user
+    const email = 'api-user3@example.com';
+    const name = 'API User';
+    const password = 'supersafe123';
+    const agent = request.agent();
+    const authUser = await agent
+      .post(`${baseUrl}/users`)
+      .send({ email, name, password })
+      .set('content-type', 'application/json');
+    // register another user
+    const email2 = 'api-user2@example.com';
+    const name2 = 'API User 2';
+    const password2 = 'supersafe123';
+    const user2 = await agent
+      .post(`${baseUrl}/users`)
+      .send({ email: email2, name: name2, password: password2 })
+      .set('content-type', 'application/json');
+    // login as first user
+    await agent
+      .get(`${baseUrl}/dev/loginAsUser?userId=${authUser.body.id}`)
+      .set('content-type', 'application/json');
+    // get other user by id from api, it should result in 404
+    const user = await agent
+    .get(`${baseUrl}/users/${user2.body.id}`)
+    .ok(res => res.status === 404)
+      .set('content-type', 'application/json');
+    // get all users, only authenticated user should be returned
+    const users = await agent
+      .get(`${baseUrl}/users`)
+      .set('content-type', 'application/json');
+    expect(users.body.data.length).toBe(1);
+    expect(users.body.data[0].email).toBe(email);
+
+    // login as admin
+    await agent
+      .get(`${baseUrl}/dev/loginAsUser?userId=1&isAdmin=true`)
+      .set('content-type', 'application/json');
+    // get all users, all users should be returned
+    const usersAsAdmin = await agent
+      .get(`${baseUrl}/users`)
+      .set('content-type', 'application/json');
+    expect(usersAsAdmin.body.data.length).toBeGreaterThan(1);
+  });
 });
 

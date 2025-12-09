@@ -39,15 +39,11 @@ export function createServer(db: PrismaClient, port?: number) {
 
 function setupDevRoutes(app: express.Application) {
     app.get('/dev/loginAsUser', async (req: express.Request, res: express.Response) => {
-        res.cookie('session', await new jose.SignJWT({ userId: req.query.userId as string }).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().setExpirationTime('1h').sign(secret), { httpOnly: true, secure: false });
+        res.cookie('session', await new jose.SignJWT({ userId: req.query.userId as string, isAdmin: req.query.isAdmin as string === 'true' }).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().setExpirationTime('1h').sign(secret), { httpOnly: true, secure: false });
         res.redirect('/');
     });
     app.get('/dev/logout', (req: express.Request, res: express.Response) => {
         res.clearCookie('session');
-        res.redirect('/');
-    });
-    app.get('/dev/loginAsAdmin', async (req: express.Request, res: express.Response) => {
-        res.cookie('session', await new jose.SignJWT({ userId: 1, isAdmin: true }).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().setExpirationTime('1h').sign(secret), { httpOnly: true, secure: false });
         res.redirect('/');
     });
 }
