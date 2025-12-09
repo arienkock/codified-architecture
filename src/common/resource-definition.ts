@@ -25,6 +25,7 @@ export interface ResourceDefinition {
     };
     delete: {
         authorizers: Authorizer[];
+        requestParamsSchema: z.ZodSchema;
         securityFilterGenerator: SecurityFilterGenerator;
         validators: Validator[];
     };

@@ -26,7 +26,7 @@ const userResourceDefinition: ResourceDefinition = {
         ],
     },
     update: {
-        requestBodySchema: UserUpdateInputObjectZodSchema.omit(internalFields).extend({ password: z.string() }).strict(),
+        requestBodySchema: UserUpdateInputObjectZodSchema.omit(internalFields).extend({ password: z.string() }).strict().partial(),
         securityFilterGenerator: securityFilterGenerator,
         requestParamsSchema: z.object({ id: z.coerce.number().int() }),
         validators: [],
@@ -36,6 +36,7 @@ const userResourceDefinition: ResourceDefinition = {
     },
     delete: {
         securityFilterGenerator: securityFilterGenerator,
+        requestParamsSchema: z.object({ id: z.coerce.number().int() }),
         authorizers: [
             authenticationRequiredAuthorizer,
         ],

@@ -4,7 +4,7 @@ import { AddressInfo } from 'net';
 import { PrismaClient } from '../../src/persistence/generated/prisma/index.js';
 import { createServer } from '../../src/server/server.js';
 
-describe('User API - create', () => {
+describe('User API', () => {
   let server: ReturnType<typeof createServer>;
   let baseUrl: string;
   let db: PrismaClient;
@@ -129,6 +129,63 @@ describe('User API - create', () => {
     const res4 = await testRequest
       .delete(`${baseUrl}/users/1`)
       .ok(res => res.status === 401)
+      .set('content-type', 'application/json');
+  });
+  it('deletes a user', async () => {
+    // register a user
+    const email = 'api-user4@example.com';
+    const name = 'API User 4';
+    const password = 'supersafe123';
+    const agent = testRequest.agent();
+    const user = await agent
+      .post(`${baseUrl}/users`)
+      .send({ email, name, password })
+      .set('content-type', 'application/json');
+    // login as user
+    await agent
+      .get(`${baseUrl}/dev/loginAsUser?userId=${user.body.id}`)
+      .set('content-type', 'application/json');
+    // delete user
+    const deleted = await agent
+      .delete(`${baseUrl}/users/${user.body.id}`)
+      .set('content-type', 'application/json');
+    expect(deleted.status).toBe(200);
+    // verify user is deleted
+    const userNotFound = await agent
+      .get(`${baseUrl}/users/${user.body.id}`)
+      .ok(res => res.status === 404)
+      .set('content-type', 'application/json');
+  });
+  it('lets admin user update and delete other users', async () => {
+    // register a user
+    const email = 'api-user5@example.com';
+    const name = 'API User 5';
+    const password = 'supersafe123';
+    const agent = testRequest.agent();
+    const user = await agent
+      .post(`${baseUrl}/users`)
+      .send({ email, name, password })
+      .set('content-type', 'application/json');
+    // login as admin
+    await agent
+      .get(`${baseUrl}/dev/loginAsUser?userId=1&isAdmin=true`)
+      .set('content-type', 'application/json');
+    // update user
+    const updated = await agent
+      .put(`${baseUrl}/users/${user.body.id}`)
+      .send({ email: 'api-user5-updated@example.com', name: 'API User 5 Updated' })
+      .set('content-type', 'application/json');
+    expect(updated.body.email).toBe('api-user5-updated@example.com');
+    expect(updated.body.name).toBe('API User 5 Updated');
+    // delete user
+    const deleted = await agent
+      .delete(`${baseUrl}/users/${user.body.id}`)
+      .set('content-type', 'application/json');
+    expect(deleted.status).toBe(200);
+    // verify user is deleted
+    const userNotFound = await agent
+      .get(`${baseUrl}/users/${user.body.id}`)
+      .ok(res => res.status === 404)
       .set('content-type', 'application/json');
   });
 });

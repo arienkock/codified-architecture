@@ -126,14 +126,8 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
         repo.update({
             data: data as any,
             where: {
-                AND: [
-                    {
-                        id: requestParams.id,
-                    },
-                    {
-                        ...securityFilter,
-                    },
-                ],
+                id: requestParams.id,
+                ...securityFilter,
             },
         }).then((d: any) => {
             if (d) {
@@ -146,8 +140,38 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
             return res.status(500).json({ message: "Internal server error" } satisfies GenericErrorResponse);
         });
     });
-    router.delete("/:id", (req, res) => {
-        res.json({ message: "Hello, world!" });
+    router.delete("/:id", async (req, res) => {
+        try {
+            await Promise.all(resourceDefinition.delete.authorizers.map((authorizer) => authorizer(req.securityContext)));
+        } catch (error) {
+            return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);
+        }
+        let requestParams: any;
+        let securityFilter: any;
+        try {
+            requestParams = resourceDefinition.delete.requestParamsSchema.parse({ ...req.query, ...req.params });
+            securityFilter = resourceDefinition.delete.securityFilterGenerator(req.securityContext, {} as any);
+        } catch (error) {
+            if (error instanceof z.ZodError) {
+                return res.status(400).json({ message: "Invalid request", errors: error.issues } satisfies GenericErrorResponse);
+            }
+            return res.status(400).json({ message: "Invalid request" } satisfies GenericErrorResponse);
+        }
+        repo.delete({
+            where: {
+                 id: requestParams.id,
+                ...securityFilter,
+            },
+        }).then((d: any) => {
+            if (d) {
+                res.json({ message: "Deleted" });
+            } else {
+                return res.status(404).json({ message: "Not found" } satisfies GenericErrorResponse);
+            }
+    }).catch((error: any) => {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error" } satisfies GenericErrorResponse);
+    });
     });
     return router;
 }
