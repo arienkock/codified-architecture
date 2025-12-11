@@ -21,15 +21,6 @@ const config: Config = {
   transformIgnorePatterns: [],
   globalSetup: '<rootDir>/tests/utils/globalSetup.ts',
   globalTeardown: '<rootDir>/tests/utils/globalTeardown.ts',
-  // Improve stack trace display
-  errorOnDeprecated: true,
-  // Show more detailed error information
-  verbose: false,
-  // Better error formatting
-  displayName: {
-    name: 'codified-architecture',
-    color: 'blue',
-  },
   // Coverage configuration
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',

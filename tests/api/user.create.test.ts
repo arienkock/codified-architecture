@@ -1,5 +1,5 @@
 import { describe, expect, it, afterAll, beforeAll } from '@jest/globals';
-import { testRequest } from '../utils/test-request.js';
+import request from 'superagent';
 import { AddressInfo } from 'net';
 import { PrismaClient } from '../../src/persistence/generated/prisma/index.js';
 import { createServer } from '../../src/server/server.js';
@@ -25,7 +25,7 @@ describe('User API', () => {
     const email = 'api-user@example.com';
     const name = 'API User';
     const password = 'supersafe123';
-    const agent = testRequest.agent();
+    const agent = request.agent();
     const res = await agent
       .post(`${baseUrl}/users`)
       .send({ email, name, password })
@@ -56,7 +56,7 @@ describe('User API', () => {
   });
 
   it('returns validation errors for missing and invalid fields', async () => {
-    const res = await testRequest
+    const res = await request
       .post(`${baseUrl}/users`)
       .ok(res => res.status === 400)
       .send({ email: 'invalid-email' })
@@ -73,7 +73,7 @@ describe('User API', () => {
     const email = 'api-user3@example.com';
     const name = 'API User';
     const password = 'supersafe123';
-    const agent = testRequest.agent();
+    const agent = request.agent();
     const authUser = await agent
       .post(`${baseUrl}/users`)
       .send({ email, name, password })
@@ -114,19 +114,19 @@ describe('User API', () => {
   });
 
   it('requires authenication all endpoints except creation', async () => {
-    const res = await testRequest
+    const res = await request
       .get(`${baseUrl}/users`)
       .ok(res => res.status === 401)
       .set('content-type', 'application/json');
-    const res2 = await testRequest
+    const res2 = await request
       .get(`${baseUrl}/users/1`)
       .ok(res => res.status === 401)
       .set('content-type', 'application/json');
-    const res3 = await testRequest
+    const res3 = await request
       .put(`${baseUrl}/users/1`)
       .ok(res => res.status === 401)
       .set('content-type', 'application/json');
-    const res4 = await testRequest
+    const res4 = await request
       .delete(`${baseUrl}/users/1`)
       .ok(res => res.status === 401)
       .set('content-type', 'application/json');
@@ -136,7 +136,7 @@ describe('User API', () => {
     const email = 'api-user4@example.com';
     const name = 'API User 4';
     const password = 'supersafe123';
-    const agent = testRequest.agent();
+    const agent = request.agent();
     const user = await agent
       .post(`${baseUrl}/users`)
       .send({ email, name, password })
@@ -161,7 +161,7 @@ describe('User API', () => {
     const email = 'api-user5@example.com';
     const name = 'API User 5';
     const password = 'supersafe123';
-    const agent = testRequest.agent();
+    const agent = request.agent();
     const user = await agent
       .post(`${baseUrl}/users`)
       .send({ email, name, password })
@@ -190,7 +190,7 @@ describe('User API', () => {
   });
 
   it('returns 400 when trying to update user with a non-existent field', async () => {
-    const agent = testRequest.agent();
+    const agent = request.agent();
     const user = await agent
       .post(`${baseUrl}/users`)
       .send({ email: 'api-user6@example.com', name: 'API User 6', password: 'supersafe123' })
@@ -205,6 +205,52 @@ describe('User API', () => {
       .send({ email: 'api-user6-updated@example.com', name: 'API User 6 Updated', nonExistentField: 'test' })
       .set('content-type', 'application/json');
     expect(updated.body.errors).toBeDefined();
+  });
+
+  it('should support pagination', async () => {
+    // Create users until there are at least 10
+    const agent = request.agent();
+    for (let i = 0; i < 10; i++) {
+      await agent
+        .post(`${baseUrl}/users`)
+        .send({ email: `api-user7-${i}@example.com`, name: `API User 7 ${i}`, password: 'supersafe123' })
+        .set('content-type', 'application/json');
+    }
+    // login as admin
+    await agent
+      .get(`${baseUrl}/dev/loginAsUser?userId=1&isAdmin=true`)
+      .set('content-type', 'application/json');
+    // get all pages, with page size 2
+    const users = await agent
+      .get(`${baseUrl}/users?page=0&pageSize=2`)
+      .set('content-type', 'application/json');
+    expect(users.body.data.length).toBe(2);
+    expect(users.body.pagination.total).toBeGreaterThanOrEqual(10);
+    expect(users.body.pagination.totalPages).toBeGreaterThanOrEqual(5);
+    expect(users.body.pagination.hasNext).toBe(true);
+    expect(users.body.pagination.hasPrev).toBe(false);
+    // grab second page
+    const users2 = await agent
+      .get(`${baseUrl}/users?page=1&pageSize=2`)
+      .set('content-type', 'application/json');
+    expect(users2.body.data.length).toBe(2);
+    expect(users2.body.pagination.total).toBeGreaterThanOrEqual(10);
+    expect(users2.body.pagination.totalPages).toBeGreaterThanOrEqual(5);
+    expect(users2.body.pagination.hasNext).toBe(true);
+    expect(users2.body.pagination.hasPrev).toBe(true);
+    // compare the IDs to make sure the results are different
+    expect(users.body.data[0].id).not.toBe(users2.body.data[0].id);
+    expect(users.body.data[1].id).not.toBe(users2.body.data[1].id);
+    // grab last page
+    const users3 = await agent
+      .get(`${baseUrl}/users?page=${users2.body.pagination.totalPages - 1}&pageSize=2`)
+      .set('content-type', 'application/json');
+    expect(users3.body.data.length).toBe(2);
+    expect(users3.body.pagination.total).toBeGreaterThanOrEqual(10);
+    expect(users3.body.pagination.totalPages).toBeGreaterThanOrEqual(5);
+    expect(users3.body.pagination.hasNext).toBe(false);
+    expect(users3.body.pagination.hasPrev).toBe(true);
+    
   });
 });
 

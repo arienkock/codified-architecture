@@ -60,7 +60,7 @@ function securityFilterGenerator(securityContext: SecurityContext, requestParams
         return {};
     }
     return {
-        id: securityContext.currentUserId,
+        id: securityContext.currentUserId && parseInt(securityContext.currentUserId),
     };
 }
 

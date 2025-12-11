@@ -39,7 +39,7 @@ export function createServer(db: PrismaClient, port?: number) {
 
 function setupDevRoutes(app: express.Application) {
     app.get('/dev/loginAsUser', async (req: express.Request, res: express.Response) => {
-        res.cookie('session', await new jose.SignJWT({ userId: req.query.userId as string, isAdmin: req.query.isAdmin as string === 'true' }).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().setExpirationTime('1h').sign(secret), { httpOnly: true, secure: false });
+        await initSesssionCookieForUser(res, { currentUserId: req.query.userId as string, isAdmin: req.query.isAdmin as string === 'true' })
         res.redirect('/');
     });
     app.get('/dev/logout', (req: express.Request, res: express.Response) => {
@@ -47,10 +47,13 @@ function setupDevRoutes(app: express.Application) {
         res.redirect('/');
     });
 }
-
 function setupRoutes(app: express.Application, db: PrismaClient) {
     app.use(securityContextMiddleware)
     app.use(`/${userResourceDefinition.namePlural}`, createCRUDRoutes(db, db.user, userResourceDefinition));
+}
+
+async function initSesssionCookieForUser(res: express.Response, user: SecurityContext) {
+    res.cookie('session', await new jose.SignJWT(user as any).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().setExpirationTime('1h').sign(secret), { httpOnly: true, secure: false });
 }
 
 declare module 'express-serve-static-core' {
@@ -61,19 +64,19 @@ declare module 'express-serve-static-core' {
 
 // TODO: Use cookie parser to use signed cookies.
 async function securityContextMiddleware(req: express.Request, res: express.Response, next: express.NextFunction) {
-    const securityContext: SecurityContext = await parseSessionCookie(req.cookies?.session ?? '');
-    req.securityContext = securityContext;
+    const securityContext = await parseSessionCookie(req.cookies?.session ?? '');
+    if (!!securityContext) {
+        req.securityContext = securityContext;
+    }
     return next();
 }
 
-async function parseSessionCookie(sessionCookie: string): Promise<any> {
+async function parseSessionCookie(sessionCookie: string): Promise<SecurityContext | undefined> {
     try {
-        const { payload } = await jose.jwtVerify(sessionCookie, secret)
-        return {
-            currentUserId: parseInt(payload.userId as string),
-            isAdmin: payload.isAdmin as boolean,
-        };
+        const { payload } = await jose.jwtVerify(sessionCookie, secret) as { payload: SecurityContext };
+        return payload;
     } catch (error) {
-        return {};
+        return undefined;
     }
 }
+

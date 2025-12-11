@@ -1,7 +1,7 @@
 import z from "zod";
 
 export interface SecurityContext {
-    currentUserId?: number;
+    currentUserId: string;
     isAdmin?: boolean;
 }
 
