@@ -12,6 +12,7 @@
     "start": "tsx src/index.js",
     "dev": "NODE_ENV=development tsx watch src/index.ts",
     "test": "jest --runInBand",
+    "test:coverage": "jest --runInBand --coverage",
     "db:start": "docker run -d --name codified-architecture-db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=codified_architecture -p 5432:5432 -v codified-architecture-postgres-data:/var/lib/postgresql/data --restart unless-stopped postgres:16-alpine || docker start codified-architecture-db",
     "db:stop": "docker stop codified-architecture-db",
     "db:restart": "docker restart codified-architecture-db",
