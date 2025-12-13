@@ -217,12 +217,10 @@ describe('User API', () => {
         .set('content-type', 'application/json');
     }
     // login as admin
-    console.log('Logging in as admin');
     await agent
       .get(`${baseUrl}/dev/loginAsUser?userId=1&isAdmin=true`)
       .set('content-type', 'application/json');
     // get all pages, with page size 2
-    console.log('Getting all pages, with page size 2');
     const users = await agent
       .get(`${baseUrl}/users?page=0&pageSize=2`)
       .set('content-type', 'application/json');
@@ -232,7 +230,6 @@ describe('User API', () => {
     expect(users.body.pagination.hasNext).toBe(true);
     expect(users.body.pagination.hasPrev).toBe(false);
     // grab second page
-    console.log('Grabbing second page');
     const users2 = await agent
       .get(`${baseUrl}/users?page=1&pageSize=2`)
       .set('content-type', 'application/json');
@@ -245,7 +242,6 @@ describe('User API', () => {
     expect(users.body.data[0].id).not.toBe(users2.body.data[0].id);
     expect(users.body.data[1].id).not.toBe(users2.body.data[1].id);
     // grab last page
-    console.log('Grabbing last page');
     const users3 = await agent
       .get(`${baseUrl}/users?page=${users2.body.pagination.totalPages - 1}&pageSize=2`)
       .set('content-type', 'application/json');
