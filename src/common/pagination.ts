@@ -9,14 +9,14 @@ export const paginationSchema = z.object({
     hasPrev: z.boolean(),
 });
 
-export function createPagenatedResponseSchema(schema: z.ZodSchema): z.ZodSchema {
+export function createPaginatedResponseSchema(schema: z.ZodSchema): z.ZodSchema {
     return z.object({
         data: z.array(schema),
         pagination: paginationSchema,
     })
 }
 
-export type PagenatedResponse<T> = {
+export type PaginatedResponse<T> = {
     data: T[];
     pagination: z.infer<typeof paginationSchema>;
 }

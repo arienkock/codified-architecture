@@ -1,7 +1,7 @@
 import z from "zod";
 import { createDocument, ZodOpenApiOperationObject, ZodOpenApiPathItemObject } from "zod-openapi";
 import { ResourceDefinition } from "../common/resource-definition.js";
-import { createPagenatedResponseSchema } from "../common/pagination.js";
+import { createPaginatedResponseSchema } from "../common/pagination.js";
 
 import userResourceDefinition from "../services/handlers/user.js";
 
@@ -119,7 +119,7 @@ function ReadCollectionResourcePath(resourceDefinition: ResourceDefinition): Zod
                 description: "OK",
                 content: {
                     "application/json": {
-                        schema: createPagenatedResponseSchema(resourceDefinition.read.responseSchema),
+                        schema: createPaginatedResponseSchema(resourceDefinition.read.responseSchema),
                     }
                 }
             }

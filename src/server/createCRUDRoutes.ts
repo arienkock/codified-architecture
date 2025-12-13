@@ -1,6 +1,6 @@
 import express from "express";
 import z from "zod";
-import { paginationParamsSchema, PagenatedResponse } from "../common/pagination";
+import { paginationParamsSchema, PaginatedResponse } from "../common/pagination";
 import { ResourceDefinition } from "../common/resource-definition";
 import { DEFAULT_PAGE_SIZE } from "../config";
 import { PrismaClient } from "../persistence/generated/prisma";
@@ -47,7 +47,7 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
                     hasNext: page < totalPages - 1,
                     hasPrev: page > 0,
                 },
-            } satisfies PagenatedResponse<z.infer<typeof resourceDefinition.read.responseSchema>>);
+            } satisfies PaginatedResponse<z.infer<typeof resourceDefinition.read.responseSchema>>);
         }).catch((error: any) => {
             console.log(error);
             return res.status(500).json({ message: "Internal server error" } satisfies GenericErrorResponse);
