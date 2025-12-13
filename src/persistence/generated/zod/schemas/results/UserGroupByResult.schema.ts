@@ -8,7 +8,8 @@ export const UserGroupByResultSchema = z.array(z.object({
     id: z.number(),
     email: z.number(),
     name: z.number(),
-    hashedPassword: z.number()
+    hashedPassword: z.number(),
+    organizations: z.number()
   }).optional(),
   _sum: z.object({
     id: z.number().nullable()

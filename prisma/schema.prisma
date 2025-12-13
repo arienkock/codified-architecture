@@ -24,4 +24,24 @@ model User {
   email           String   @unique
   name            String?
   hashedPassword  String
+  organizations   UserOrganization[]
+}
+
+model Organization {
+  id              Int      @id @default(autoincrement())
+  name            String
+  members         UserOrganization[]
+}
+
+model UserOrganization {
+  id             Int          @id @default(autoincrement())
+  userId         Int
+  organizationId Int
+  isCurrent      Boolean      @default(false)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@index([userId])
+  @@index([organizationId])
 }

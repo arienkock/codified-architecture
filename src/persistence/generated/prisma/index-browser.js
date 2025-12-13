@@ -127,6 +127,18 @@ exports.Prisma.UserScalarFieldEnum = {
   hashedPassword: 'hashedPassword'
 };
 
+exports.Prisma.OrganizationScalarFieldEnum = {
+  id: 'id',
+  name: 'name'
+};
+
+exports.Prisma.UserOrganizationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  organizationId: 'organizationId',
+  isCurrent: 'isCurrent'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -144,7 +156,9 @@ exports.Prisma.NullsOrder = {
 
 
 exports.Prisma.ModelName = {
-  User: 'User'
+  User: 'User',
+  Organization: 'Organization',
+  UserOrganization: 'UserOrganization'
 };
 
 /**

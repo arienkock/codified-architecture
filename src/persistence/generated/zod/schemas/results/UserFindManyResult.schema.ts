@@ -4,7 +4,8 @@ export const UserFindManyResultSchema = z.object({
   id: z.number().int(),
   email: z.string(),
   name: z.string().optional(),
-  hashedPassword: z.string()
+  hashedPassword: z.string(),
+  organizations: z.array(z.unknown())
 })),
   pagination: z.object({
   page: z.number().int().min(1),
