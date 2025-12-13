@@ -14,10 +14,20 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
         } catch (error) {
             return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);
         }
-        const paginationParams = paginationParamsSchema.parse(req.query);
+        let paginationParams: { page?: number; pageSize?: number };
+        let where: any;
+        try {
+            paginationParams = paginationParamsSchema.parse(req.query);
+            where = resourceDefinition.read.securityFilterGenerator(req.securityContext, {} as any);
+        } catch (error) {
+            if (error instanceof z.ZodError) {
+                return res.status(400).json({ message: "Invalid request", errors: error.issues } satisfies GenericErrorResponse);
+            }
+            console.log(error);
+            return res.status(400).json({ message: "Invalid request" } satisfies GenericErrorResponse);
+        }
         const page = paginationParams.page ?? 0;
         const pageSize = paginationParams.pageSize ?? DEFAULT_PAGE_SIZE;
-        const where = resourceDefinition.read.securityFilterGenerator(req.securityContext, {} as any);
         return db.$transaction([
             repo.findMany({
                 skip: page * pageSize,
@@ -38,6 +48,9 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
                     hasPrev: page > 0,
                 },
             } satisfies PagenatedResponse<z.infer<typeof resourceDefinition.read.responseSchema>>);
+        }).catch((error: any) => {
+            console.log(error);
+            return res.status(500).json({ message: "Internal server error" } satisfies GenericErrorResponse);
         });
     });
     router.post("/", async (req, res) => {
@@ -63,7 +76,7 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
         })
             .then((d: any) => res.json(resourceDefinition.read.responseSchema.parse(d)))
             .catch((error: any) => {
-                console.error(error);
+                console.log(error);
                 return res.status(500).json({ message: "Internal server error" } satisfies GenericErrorResponse);
             });
     });
@@ -99,7 +112,7 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
                 return res.status(404).json({ message: "Not found" } satisfies GenericErrorResponse);
             }
         }).catch((error: any) => {
-            console.error(error);
+            console.log(error);
             return res.status(500).json({ message: "Internal server error" } satisfies GenericErrorResponse);
         });
     });
@@ -136,7 +149,7 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
                 return res.status(404).json({ message: "Not found" } satisfies GenericErrorResponse);
             }
         }).catch((error: any) => {
-            console.error(error);
+            console.log(error);
             return res.status(500).json({ message: "Internal server error" } satisfies GenericErrorResponse);
         });
     });
@@ -169,7 +182,7 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
                 return res.status(404).json({ message: "Not found" } satisfies GenericErrorResponse);
             }
     }).catch((error: any) => {
-        console.error(error);
+        console.log(error);
         return res.status(500).json({ message: "Internal server error" } satisfies GenericErrorResponse);
     });
     });

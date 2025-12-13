@@ -22,6 +22,6 @@ export type PagenatedResponse<T> = {
 }
 
 export const paginationParamsSchema = z.object({
-    page: z.number().optional(),
-    pageSize: z.number().optional(),
+    page: z.coerce.number().optional(),
+    pageSize: z.coerce.number().optional(),
 });

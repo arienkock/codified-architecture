@@ -10,6 +10,7 @@ const config: Config = {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
   verbose: true,
+  silent: false,
   transform: {
     '^.+\\.(t|j)sx?$': [
       'ts-jest',
