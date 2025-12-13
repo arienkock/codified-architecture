@@ -18,7 +18,7 @@ describe('User API', () => {
 
   afterAll(async () => {
     await db.$disconnect();
-    server.close();
+    await new Promise<void>((resolve, reject) => server.close(err => err ? reject(err) : resolve()));
   });
 
   it('creates a user and returns sanitized payload', async () => {

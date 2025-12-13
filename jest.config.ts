@@ -9,6 +9,7 @@ const config: Config = {
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
+  verbose: true,
   transform: {
     '^.+\\.(t|j)sx?$': [
       'ts-jest',
