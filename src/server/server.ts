@@ -7,6 +7,7 @@ import { SecurityContext } from "../common/security.js";
 import * as jose from 'jose'
 import { JWT_SECRET } from "../config.js";
 import cookieParser from "cookie-parser";
+import { rateLimitMiddleware } from "./rateLimitMiddleware.js";
 
 const secret = new TextEncoder().encode(
     JWT_SECRET
@@ -17,6 +18,7 @@ export function createServer(db: PrismaClient, port?: number) {
 
     const resolvedPort = port ?? (process.env.PORT ? Number(process.env.PORT) : undefined) ?? 3000;
 
+    app.use(rateLimitMiddleware);
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
     app.use(cookieParser());
