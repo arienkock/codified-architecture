@@ -3,9 +3,11 @@ import { ResourceDefinition } from "../../common/resource-definition.js"
 import { UserCreateInputObjectZodSchema, UserCreateResultSchema, UserUpdateInputObjectZodSchema } from "../../persistence/generated/zod/schemas/index.js";
 import bcrypt from "bcrypt";
 import { SecurityContext } from "../../common/security.js";
+import { PrismaClient } from "../../persistence/generated/prisma/index.js";
 
 const internalFields: Record<string, true> = {
     hashedPassword: true,
+    organizations: true,
 }
 
 const userResourceDefinition: ResourceDefinition = {
@@ -16,6 +18,7 @@ const userResourceDefinition: ResourceDefinition = {
         requestBodyTransformer: hashPasswordTransformer,
         validators: [],
         authorizers: [],
+        postCreateHook: createPersonalOrganization,
     },
     read: {
         responseSchema: UserCreateResultSchema.omit(internalFields),
@@ -52,6 +55,7 @@ function hashPasswordTransformer(input: any): z.infer<typeof UserCreateInputObje
         hashedPassword: bcrypt.hashSync(input.password, 10),
     };
     delete result.password;
+    delete result.organizations;
     return result;
 }
 
@@ -69,4 +73,20 @@ function authenticationRequiredAuthorizer(securityContext: SecurityContext): Pro
         throw new Error('Authentication required');
     }
     return Promise.resolve();
+}
+
+async function createPersonalOrganization(createdUser: any, db: PrismaClient, securityContext: SecurityContext): Promise<void> {
+    const organizationName = createdUser.name ? `${createdUser.name}'s Personal` : 'Personal';
+    const organization = await db.organization.create({
+        data: {
+            name: organizationName,
+        },
+    });
+    await db.userOrganization.create({
+        data: {
+            userId: createdUser.id,
+            organizationId: organization.id,
+            isCurrent: true,
+        },
+    });
 }

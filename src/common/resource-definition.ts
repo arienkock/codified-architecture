@@ -1,5 +1,6 @@
 import z from "zod";
 import { SecurityContext, SecurityFilterGenerator } from "./security";
+import { PrismaClient } from "../persistence/generated/prisma";
 
 export interface ResourceDefinition {
     name: string;
@@ -9,6 +10,7 @@ export interface ResourceDefinition {
         requestBodyTransformer?: Transformer;
         validators: Validator[];
         authorizers: Authorizer[];
+        postCreateHook?: PostCreateHook;
     };
     read: {
         requestParamsSchema: z.ZodSchema;
@@ -41,4 +43,8 @@ export interface Authorizer {
 
 export interface Transformer {
     (input: any): any
+}
+
+export interface PostCreateHook {
+    (createdEntity: any, db: PrismaClient, securityContext: SecurityContext): Promise<void>
 }

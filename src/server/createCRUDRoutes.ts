@@ -71,8 +71,16 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
         if (resourceDefinition.create.requestBodyTransformer) {
             body = resourceDefinition.create.requestBodyTransformer(body);
         }
-        return repo.create({
-            data: body as any,
+        return db.$transaction(async (tx) => {
+            const modelName = resourceDefinition.name.charAt(0).toLowerCase() + resourceDefinition.name.slice(1);
+            const txRepo = (tx as any)[modelName];
+            const created = await txRepo.create({
+                data: body as any,
+            });
+            if (resourceDefinition.create.postCreateHook) {
+                await resourceDefinition.create.postCreateHook(created, tx, req.securityContext);
+            }
+            return created;
         })
             .then((d: any) => res.json(resourceDefinition.read.responseSchema.parse(d)))
             .catch((error: any) => {
