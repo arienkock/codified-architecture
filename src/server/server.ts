@@ -2,6 +2,7 @@ import express from "express";
 import document from "./openapi.js";
 import { PrismaClient } from "../persistence/generated/prisma/client.js";
 import userResourceDefinition from "../services/handlers/user.js";
+import organizationResourceDefinition from "../services/handlers/organization.js";
 import { createCRUDRoutes } from "./createCRUDRoutes.js";
 import { SecurityContext } from "../common/security.js";
 import * as jose from 'jose'
@@ -88,6 +89,7 @@ function setupDevRoutes(app: express.Application) {
 function setupRoutes(app: express.Application, db: PrismaClient) {
     app.use(securityContextMiddleware)
     app.use(`/${userResourceDefinition.namePlural}`, createCRUDRoutes(db, db.user, userResourceDefinition));
+    app.use(`/${organizationResourceDefinition.namePlural}`, createCRUDRoutes(db, db.organization, organizationResourceDefinition));
 }
 
 async function initSesssionCookieForUser(res: express.Response, user: SecurityContext) {
