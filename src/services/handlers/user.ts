@@ -55,7 +55,6 @@ function hashPasswordTransformer(input: any): z.infer<typeof UserCreateInputObje
         hashedPassword: bcrypt.hashSync(input.password, 10),
     };
     delete result.password;
-    delete result.organizations;
     return result;
 }
 
