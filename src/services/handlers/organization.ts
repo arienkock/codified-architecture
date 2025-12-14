@@ -19,8 +19,8 @@ const organizationResourceDefinition: ResourceDefinition = {
         postCreateHook: addCreatorAsAdmin,
     },
     read: {
-        responseSchema: OrganizationCreateResultSchema.omit(internalFields),
         requestParamsSchema: z.object({ id: z.coerce.number().int() }),
+        responseSchema: OrganizationCreateResultSchema.omit(internalFields),
         securityFilterGenerator: securityFilterGenerator,
         authorizers: [
             authenticationRequiredAuthorizer,
@@ -28,19 +28,19 @@ const organizationResourceDefinition: ResourceDefinition = {
     },
     update: {
         requestBodySchema: OrganizationUpdateInputObjectZodSchema.omit(internalFields).strict().partial(),
-        securityFilterGenerator: securityFilterGenerator,
         requestParamsSchema: z.object({ id: z.coerce.number().int() }),
+        securityFilterGenerator: securityFilterGenerator,
         validators: [],
         authorizers: [
             authenticationRequiredAuthorizer,
         ],
     },
     delete: {
-        securityFilterGenerator: securityFilterGenerator,
-        requestParamsSchema: z.object({ id: z.coerce.number().int() }),
         authorizers: [
             authenticationRequiredAuthorizer,
         ],
+        requestParamsSchema: z.object({ id: z.coerce.number().int() }),
+        securityFilterGenerator: securityFilterGenerator,
         validators: [],
     },
 }

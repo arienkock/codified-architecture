@@ -21,8 +21,8 @@ const userResourceDefinition: ResourceDefinition = {
         postCreateHook: createPersonalOrganization,
     },
     read: {
-        responseSchema: UserCreateResultSchema.omit(internalFields),
         requestParamsSchema: z.object({ id: z.coerce.number().int() }),
+        responseSchema: UserCreateResultSchema.omit(internalFields),
         securityFilterGenerator: securityFilterGenerator,
         authorizers: [
             authenticationRequiredAuthorizer,
@@ -30,19 +30,19 @@ const userResourceDefinition: ResourceDefinition = {
     },
     update: {
         requestBodySchema: UserUpdateInputObjectZodSchema.omit(internalFields).extend({ password: z.string() }).strict().partial(),
-        securityFilterGenerator: securityFilterGenerator,
         requestParamsSchema: z.object({ id: z.coerce.number().int() }),
+        securityFilterGenerator: securityFilterGenerator,
         validators: [],
         authorizers: [
             authenticationRequiredAuthorizer,
         ],
     },
     delete: {
-        securityFilterGenerator: securityFilterGenerator,
-        requestParamsSchema: z.object({ id: z.coerce.number().int() }),
         authorizers: [
             authenticationRequiredAuthorizer,
         ],
+        requestParamsSchema: z.object({ id: z.coerce.number().int() }),
+        securityFilterGenerator: securityFilterGenerator,
         validators: [],
     },
 }
