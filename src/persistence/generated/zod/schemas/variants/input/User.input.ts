@@ -6,7 +6,8 @@ export const UserInputSchema = z.object({
     email: z.string(),
     name: z.string().optional().nullable(),
     hashedPassword: z.string(),
-    organizations: z.array(z.unknown())
+    organizations: z.array(z.unknown()),
+    invitations: z.array(z.unknown())
 }).strict();
 
 export type UserInputType = z.infer<typeof UserInputSchema>;

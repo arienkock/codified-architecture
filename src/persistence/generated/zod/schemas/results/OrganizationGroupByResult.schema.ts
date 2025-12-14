@@ -5,7 +5,8 @@ export const OrganizationGroupByResultSchema = z.array(z.object({
   _count: z.object({
     id: z.number(),
     name: z.number(),
-    members: z.number()
+    members: z.number(),
+    invitations: z.number()
   }).optional(),
   _sum: z.object({
     id: z.number().nullable()

@@ -6,7 +6,8 @@ export const UserModelSchema = z.object({
     email: z.string(),
     name: z.string().nullable(),
     hashedPassword: z.string(),
-    organizations: z.array(z.unknown())
+    organizations: z.array(z.unknown()),
+    invitations: z.array(z.unknown())
 }).strict();
 
 export type UserModelType = z.infer<typeof UserModelSchema>;

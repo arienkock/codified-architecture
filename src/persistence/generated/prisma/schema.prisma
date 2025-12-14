@@ -20,17 +20,19 @@ datasource db {
 }
 
 model User {
-  id             Int                @id @default(autoincrement())
-  email          String             @unique
+  id             Int                      @id @default(autoincrement())
+  email          String                   @unique
   name           String?
   hashedPassword String
   organizations  UserOrganization[]
+  invitations    OrganizationInvitation[]
 }
 
 model Organization {
-  id      Int                @id @default(autoincrement())
-  name    String
-  members UserOrganization[]
+  id          Int                      @id @default(autoincrement())
+  name        String
+  members     UserOrganization[]
+  invitations OrganizationInvitation[]
 }
 
 model UserOrganization {
@@ -45,4 +47,19 @@ model UserOrganization {
   @@unique([userId, organizationId])
   @@index([userId])
   @@index([organizationId])
+}
+
+model OrganizationInvitation {
+  id             Int          @id @default(autoincrement())
+  issuedAt       DateTime     @default(now())
+  accepted       Boolean      @default(false)
+  ttlMinutes     Int          @default(10080)
+  userId         Int
+  organizationId Int
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([organizationId])
+  @@index([accepted])
 }

@@ -13,6 +13,7 @@ export const OrganizationFindManySelectSchema: z.ZodType<Prisma.OrganizationSele
     id: z.boolean().optional(),
     name: z.boolean().optional(),
     members: z.boolean().optional(),
+    invitations: z.boolean().optional(),
     _count: z.boolean().optional()
   }).strict() as unknown as z.ZodType<Prisma.OrganizationSelect>;
 
@@ -20,6 +21,7 @@ export const OrganizationFindManySelectZodSchema = z.object({
     id: z.boolean().optional(),
     name: z.boolean().optional(),
     members: z.boolean().optional(),
+    invitations: z.boolean().optional(),
     _count: z.boolean().optional()
   }).strict();
 

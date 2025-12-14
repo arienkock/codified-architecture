@@ -15,6 +15,7 @@ export const UserFindFirstSelectSchema: z.ZodType<Prisma.UserSelect> = z.object(
     name: z.boolean().optional(),
     hashedPassword: z.boolean().optional(),
     organizations: z.boolean().optional(),
+    invitations: z.boolean().optional(),
     _count: z.boolean().optional()
   }).strict() as unknown as z.ZodType<Prisma.UserSelect>;
 
@@ -24,6 +25,7 @@ export const UserFindFirstSelectZodSchema = z.object({
     name: z.boolean().optional(),
     hashedPassword: z.boolean().optional(),
     organizations: z.boolean().optional(),
+    invitations: z.boolean().optional(),
     _count: z.boolean().optional()
   }).strict();
 

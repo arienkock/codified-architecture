@@ -4,7 +4,8 @@ export const UserAggregateResultSchema = z.object({  _count: z.object({
     email: z.number(),
     name: z.number(),
     hashedPassword: z.number(),
-    organizations: z.number()
+    organizations: z.number(),
+    invitations: z.number()
   }).optional(),
   _sum: z.object({
     id: z.number().nullable()

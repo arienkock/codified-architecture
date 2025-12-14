@@ -140,6 +140,15 @@ exports.Prisma.UserOrganizationScalarFieldEnum = {
   isAdmin: 'isAdmin'
 };
 
+exports.Prisma.OrganizationInvitationScalarFieldEnum = {
+  id: 'id',
+  issuedAt: 'issuedAt',
+  accepted: 'accepted',
+  ttlMinutes: 'ttlMinutes',
+  userId: 'userId',
+  organizationId: 'organizationId'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -159,7 +168,8 @@ exports.Prisma.NullsOrder = {
 exports.Prisma.ModelName = {
   User: 'User',
   Organization: 'Organization',
-  UserOrganization: 'UserOrganization'
+  UserOrganization: 'UserOrganization',
+  OrganizationInvitation: 'OrganizationInvitation'
 };
 
 /**

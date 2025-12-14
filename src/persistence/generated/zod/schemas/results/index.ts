@@ -37,3 +37,16 @@ export { UserOrganizationDeleteManyResultSchema } from './UserOrganizationDelete
 export { UserOrganizationAggregateResultSchema } from './UserOrganizationAggregateResult.schema';
 export { UserOrganizationGroupByResultSchema } from './UserOrganizationGroupByResult.schema';
 export { UserOrganizationCountResultSchema } from './UserOrganizationCountResult.schema';
+export { OrganizationInvitationFindUniqueResultSchema } from './OrganizationInvitationFindUniqueResult.schema';
+export { OrganizationInvitationFindFirstResultSchema } from './OrganizationInvitationFindFirstResult.schema';
+export { OrganizationInvitationFindManyResultSchema } from './OrganizationInvitationFindManyResult.schema';
+export { OrganizationInvitationCreateResultSchema } from './OrganizationInvitationCreateResult.schema';
+export { OrganizationInvitationCreateManyResultSchema } from './OrganizationInvitationCreateManyResult.schema';
+export { OrganizationInvitationUpdateResultSchema } from './OrganizationInvitationUpdateResult.schema';
+export { OrganizationInvitationUpdateManyResultSchema } from './OrganizationInvitationUpdateManyResult.schema';
+export { OrganizationInvitationUpsertResultSchema } from './OrganizationInvitationUpsertResult.schema';
+export { OrganizationInvitationDeleteResultSchema } from './OrganizationInvitationDeleteResult.schema';
+export { OrganizationInvitationDeleteManyResultSchema } from './OrganizationInvitationDeleteManyResult.schema';
+export { OrganizationInvitationAggregateResultSchema } from './OrganizationInvitationAggregateResult.schema';
+export { OrganizationInvitationGroupByResultSchema } from './OrganizationInvitationGroupByResult.schema';
+export { OrganizationInvitationCountResultSchema } from './OrganizationInvitationCountResult.schema';

@@ -2,13 +2,15 @@ import { z } from 'zod';
 import type { Prisma } from '../../../prisma';
 import { IntFieldUpdateOperationsInputObjectSchema as IntFieldUpdateOperationsInputObjectSchema } from './IntFieldUpdateOperationsInput.schema';
 import { StringFieldUpdateOperationsInputObjectSchema as StringFieldUpdateOperationsInputObjectSchema } from './StringFieldUpdateOperationsInput.schema';
-import { NullableStringFieldUpdateOperationsInputObjectSchema as NullableStringFieldUpdateOperationsInputObjectSchema } from './NullableStringFieldUpdateOperationsInput.schema'
+import { NullableStringFieldUpdateOperationsInputObjectSchema as NullableStringFieldUpdateOperationsInputObjectSchema } from './NullableStringFieldUpdateOperationsInput.schema';
+import { OrganizationInvitationUncheckedUpdateManyWithoutUserNestedInputObjectSchema as OrganizationInvitationUncheckedUpdateManyWithoutUserNestedInputObjectSchema } from './OrganizationInvitationUncheckedUpdateManyWithoutUserNestedInput.schema'
 
 const makeSchema = () => z.object({
   id: z.union([z.number().int(), z.lazy(() => IntFieldUpdateOperationsInputObjectSchema)]).optional(),
   email: z.union([z.string(), z.lazy(() => StringFieldUpdateOperationsInputObjectSchema)]).optional(),
   name: z.union([z.string(), z.lazy(() => NullableStringFieldUpdateOperationsInputObjectSchema)]).optional().nullable(),
-  hashedPassword: z.union([z.string(), z.lazy(() => StringFieldUpdateOperationsInputObjectSchema)]).optional()
+  hashedPassword: z.union([z.string(), z.lazy(() => StringFieldUpdateOperationsInputObjectSchema)]).optional(),
+  invitations: z.lazy(() => OrganizationInvitationUncheckedUpdateManyWithoutUserNestedInputObjectSchema).optional()
 }).strict();
 export const UserUncheckedUpdateWithoutOrganizationsInputObjectSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutOrganizationsInput> = makeSchema() as unknown as z.ZodType<Prisma.UserUncheckedUpdateWithoutOrganizationsInput>;
 export const UserUncheckedUpdateWithoutOrganizationsInputObjectZodSchema = makeSchema();

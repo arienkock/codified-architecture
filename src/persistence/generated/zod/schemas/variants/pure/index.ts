@@ -6,3 +6,4 @@
 export { UserModelSchema } from './User.pure';
 export { OrganizationModelSchema } from './Organization.pure';
 export { UserOrganizationModelSchema } from './UserOrganization.pure';
+export { OrganizationInvitationModelSchema } from './OrganizationInvitation.pure';

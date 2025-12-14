@@ -4,5 +4,6 @@ export const UserUpsertResultSchema = z.object({
   email: z.string(),
   name: z.string().optional(),
   hashedPassword: z.string(),
-  organizations: z.array(z.unknown())
+  organizations: z.array(z.unknown()),
+  invitations: z.array(z.unknown())
 });

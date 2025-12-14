@@ -3,7 +3,8 @@ import type { Prisma } from '../../../prisma';
 import { IntFilterObjectSchema as IntFilterObjectSchema } from './IntFilter.schema';
 import { StringFilterObjectSchema as StringFilterObjectSchema } from './StringFilter.schema';
 import { StringNullableFilterObjectSchema as StringNullableFilterObjectSchema } from './StringNullableFilter.schema';
-import { UserOrganizationListRelationFilterObjectSchema as UserOrganizationListRelationFilterObjectSchema } from './UserOrganizationListRelationFilter.schema'
+import { UserOrganizationListRelationFilterObjectSchema as UserOrganizationListRelationFilterObjectSchema } from './UserOrganizationListRelationFilter.schema';
+import { OrganizationInvitationListRelationFilterObjectSchema as OrganizationInvitationListRelationFilterObjectSchema } from './OrganizationInvitationListRelationFilter.schema'
 
 const userwhereinputSchema = z.object({
   AND: z.union([z.lazy(() => UserWhereInputObjectSchema), z.lazy(() => UserWhereInputObjectSchema).array()]).optional(),
@@ -13,7 +14,8 @@ const userwhereinputSchema = z.object({
   email: z.union([z.lazy(() => StringFilterObjectSchema), z.string()]).optional(),
   name: z.union([z.lazy(() => StringNullableFilterObjectSchema), z.string()]).optional().nullable(),
   hashedPassword: z.union([z.lazy(() => StringFilterObjectSchema), z.string()]).optional(),
-  organizations: z.lazy(() => UserOrganizationListRelationFilterObjectSchema).optional()
+  organizations: z.lazy(() => UserOrganizationListRelationFilterObjectSchema).optional(),
+  invitations: z.lazy(() => OrganizationInvitationListRelationFilterObjectSchema).optional()
 }).strict();
 export const UserWhereInputObjectSchema: z.ZodType<Prisma.UserWhereInput> = userwhereinputSchema as unknown as z.ZodType<Prisma.UserWhereInput>;
 export const UserWhereInputObjectZodSchema = userwhereinputSchema;

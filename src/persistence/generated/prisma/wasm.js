@@ -112,6 +112,15 @@ exports.Prisma.UserOrganizationScalarFieldEnum = {
   isAdmin: 'isAdmin'
 };
 
+exports.Prisma.OrganizationInvitationScalarFieldEnum = {
+  id: 'id',
+  issuedAt: 'issuedAt',
+  accepted: 'accepted',
+  ttlMinutes: 'ttlMinutes',
+  userId: 'userId',
+  organizationId: 'organizationId'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -131,7 +140,8 @@ exports.Prisma.NullsOrder = {
 exports.Prisma.ModelName = {
   User: 'User',
   Organization: 'Organization',
-  UserOrganization: 'UserOrganization'
+  UserOrganization: 'UserOrganization',
+  OrganizationInvitation: 'OrganizationInvitation'
 };
 /**
  * Create the Client
@@ -172,7 +182,6 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -181,13 +190,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/persistence/generated/prisma\"\n}\n\ngenerator zod {\n  provider = \"prisma-zod-generator\"\n  output   = \"../src/persistence/generated/zod\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id             Int                @id @default(autoincrement())\n  email          String             @unique\n  name           String?\n  hashedPassword String\n  organizations  UserOrganization[]\n}\n\nmodel Organization {\n  id      Int                @id @default(autoincrement())\n  name    String\n  members UserOrganization[]\n}\n\nmodel UserOrganization {\n  id             Int          @id @default(autoincrement())\n  userId         Int\n  organizationId Int\n  isCurrent      Boolean      @default(false)\n  isAdmin        Boolean      @default(false)\n  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)\n  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)\n\n  @@unique([userId, organizationId])\n  @@index([userId])\n  @@index([organizationId])\n}\n",
-  "inlineSchemaHash": "cb1a60b4eef7f0dbb6c39abc5cf0e849f4e4444e92be26b2e5c258285c43efc2",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/persistence/generated/prisma\"\n}\n\ngenerator zod {\n  provider = \"prisma-zod-generator\"\n  output   = \"../src/persistence/generated/zod\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id             Int                      @id @default(autoincrement())\n  email          String                   @unique\n  name           String?\n  hashedPassword String\n  organizations  UserOrganization[]\n  invitations    OrganizationInvitation[]\n}\n\nmodel Organization {\n  id          Int                      @id @default(autoincrement())\n  name        String\n  members     UserOrganization[]\n  invitations OrganizationInvitation[]\n}\n\nmodel UserOrganization {\n  id             Int          @id @default(autoincrement())\n  userId         Int\n  organizationId Int\n  isCurrent      Boolean      @default(false)\n  isAdmin        Boolean      @default(false)\n  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)\n  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)\n\n  @@unique([userId, organizationId])\n  @@index([userId])\n  @@index([organizationId])\n}\n\nmodel OrganizationInvitation {\n  id             Int          @id @default(autoincrement())\n  issuedAt       DateTime     @default(now())\n  accepted       Boolean      @default(false)\n  ttlMinutes     Int          @default(10080)\n  userId         Int\n  organizationId Int\n  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)\n  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)\n\n  @@index([userId])\n  @@index([organizationId])\n  @@index([accepted])\n}\n",
+  "inlineSchemaHash": "024147d11cb3049c46c092652503223b56bd79dcdc12bc17f5d62f02a91fcfb0",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"hashedPassword\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"organizations\",\"kind\":\"object\",\"type\":\"UserOrganization\",\"relationName\":\"UserToUserOrganization\"}],\"dbName\":null},\"Organization\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"members\",\"kind\":\"object\",\"type\":\"UserOrganization\",\"relationName\":\"OrganizationToUserOrganization\"}],\"dbName\":null},\"UserOrganization\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"organizationId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"isCurrent\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"isAdmin\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"UserToUserOrganization\"},{\"name\":\"organization\",\"kind\":\"object\",\"type\":\"Organization\",\"relationName\":\"OrganizationToUserOrganization\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"hashedPassword\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"organizations\",\"kind\":\"object\",\"type\":\"UserOrganization\",\"relationName\":\"UserToUserOrganization\"},{\"name\":\"invitations\",\"kind\":\"object\",\"type\":\"OrganizationInvitation\",\"relationName\":\"OrganizationInvitationToUser\"}],\"dbName\":null},\"Organization\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"members\",\"kind\":\"object\",\"type\":\"UserOrganization\",\"relationName\":\"OrganizationToUserOrganization\"},{\"name\":\"invitations\",\"kind\":\"object\",\"type\":\"OrganizationInvitation\",\"relationName\":\"OrganizationToOrganizationInvitation\"}],\"dbName\":null},\"UserOrganization\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"organizationId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"isCurrent\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"isAdmin\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"UserToUserOrganization\"},{\"name\":\"organization\",\"kind\":\"object\",\"type\":\"Organization\",\"relationName\":\"OrganizationToUserOrganization\"}],\"dbName\":null},\"OrganizationInvitation\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"issuedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"accepted\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"ttlMinutes\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"organizationId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"OrganizationInvitationToUser\"},{\"name\":\"organization\",\"kind\":\"object\",\"type\":\"Organization\",\"relationName\":\"OrganizationToOrganizationInvitation\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),
