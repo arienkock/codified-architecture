@@ -5,6 +5,7 @@ import { OrganizationCreateNestedOneWithoutMembersInputObjectSchema as Organizat
 
 const makeSchema = () => z.object({
   isCurrent: z.boolean().optional(),
+  isAdmin: z.boolean().optional(),
   user: z.lazy(() => UserCreateNestedOneWithoutOrganizationsInputObjectSchema),
   organization: z.lazy(() => OrganizationCreateNestedOneWithoutMembersInputObjectSchema)
 }).strict();

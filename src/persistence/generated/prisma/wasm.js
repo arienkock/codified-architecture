@@ -108,7 +108,8 @@ exports.Prisma.UserOrganizationScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   organizationId: 'organizationId',
-  isCurrent: 'isCurrent'
+  isCurrent: 'isCurrent',
+  isAdmin: 'isAdmin'
 };
 
 exports.Prisma.SortOrder = {
@@ -171,6 +172,7 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -179,13 +181,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/persistence/generated/prisma\"\n}\n\ngenerator zod {\n  provider = \"prisma-zod-generator\"\n  output   = \"../src/persistence/generated/zod\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id             Int                @id @default(autoincrement())\n  email          String             @unique\n  name           String?\n  hashedPassword String\n  organizations  UserOrganization[]\n}\n\nmodel Organization {\n  id      Int                @id @default(autoincrement())\n  name    String\n  members UserOrganization[]\n}\n\nmodel UserOrganization {\n  id             Int          @id @default(autoincrement())\n  userId         Int\n  organizationId Int\n  isCurrent      Boolean      @default(false)\n  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)\n  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)\n\n  @@unique([userId, organizationId])\n  @@index([userId])\n  @@index([organizationId])\n}\n",
-  "inlineSchemaHash": "42414fd667c86061558e4d9c59155b3f3bc35c3acc7ce4d3724b9c26bead8ee9",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/persistence/generated/prisma\"\n}\n\ngenerator zod {\n  provider = \"prisma-zod-generator\"\n  output   = \"../src/persistence/generated/zod\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id             Int                @id @default(autoincrement())\n  email          String             @unique\n  name           String?\n  hashedPassword String\n  organizations  UserOrganization[]\n}\n\nmodel Organization {\n  id      Int                @id @default(autoincrement())\n  name    String\n  members UserOrganization[]\n}\n\nmodel UserOrganization {\n  id             Int          @id @default(autoincrement())\n  userId         Int\n  organizationId Int\n  isCurrent      Boolean      @default(false)\n  isAdmin        Boolean      @default(false)\n  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)\n  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)\n\n  @@unique([userId, organizationId])\n  @@index([userId])\n  @@index([organizationId])\n}\n",
+  "inlineSchemaHash": "cb1a60b4eef7f0dbb6c39abc5cf0e849f4e4444e92be26b2e5c258285c43efc2",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"hashedPassword\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"organizations\",\"kind\":\"object\",\"type\":\"UserOrganization\",\"relationName\":\"UserToUserOrganization\"}],\"dbName\":null},\"Organization\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"members\",\"kind\":\"object\",\"type\":\"UserOrganization\",\"relationName\":\"OrganizationToUserOrganization\"}],\"dbName\":null},\"UserOrganization\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"organizationId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"isCurrent\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"UserToUserOrganization\"},{\"name\":\"organization\",\"kind\":\"object\",\"type\":\"Organization\",\"relationName\":\"OrganizationToUserOrganization\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"hashedPassword\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"organizations\",\"kind\":\"object\",\"type\":\"UserOrganization\",\"relationName\":\"UserToUserOrganization\"}],\"dbName\":null},\"Organization\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"members\",\"kind\":\"object\",\"type\":\"UserOrganization\",\"relationName\":\"OrganizationToUserOrganization\"}],\"dbName\":null},\"UserOrganization\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"organizationId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"isCurrent\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"isAdmin\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"UserToUserOrganization\"},{\"name\":\"organization\",\"kind\":\"object\",\"type\":\"Organization\",\"relationName\":\"OrganizationToUserOrganization\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),

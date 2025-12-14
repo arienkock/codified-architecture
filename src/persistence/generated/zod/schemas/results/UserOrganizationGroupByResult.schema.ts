@@ -4,11 +4,13 @@ export const UserOrganizationGroupByResultSchema = z.array(z.object({
   userId: z.number().int(),
   organizationId: z.number().int(),
   isCurrent: z.boolean(),
+  isAdmin: z.boolean(),
   _count: z.object({
     id: z.number(),
     userId: z.number(),
     organizationId: z.number(),
     isCurrent: z.number(),
+    isAdmin: z.number(),
     user: z.number(),
     organization: z.number()
   }).optional(),

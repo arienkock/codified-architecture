@@ -6,6 +6,7 @@ export const UserOrganizationResultSchema = z.object({
     userId: z.number().int(),
     organizationId: z.number().int(),
     isCurrent: z.boolean(),
+    isAdmin: z.boolean(),
     user: z.unknown(),
     organization: z.unknown()
 }).strict();

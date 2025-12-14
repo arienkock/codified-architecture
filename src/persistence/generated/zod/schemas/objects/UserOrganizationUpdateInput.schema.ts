@@ -6,6 +6,7 @@ import { OrganizationUpdateOneRequiredWithoutMembersNestedInputObjectSchema as O
 
 const makeSchema = () => z.object({
   isCurrent: z.union([z.boolean(), z.lazy(() => BoolFieldUpdateOperationsInputObjectSchema)]).optional(),
+  isAdmin: z.union([z.boolean(), z.lazy(() => BoolFieldUpdateOperationsInputObjectSchema)]).optional(),
   user: z.lazy(() => UserUpdateOneRequiredWithoutOrganizationsNestedInputObjectSchema).optional(),
   organization: z.lazy(() => OrganizationUpdateOneRequiredWithoutMembersNestedInputObjectSchema).optional()
 }).strict();

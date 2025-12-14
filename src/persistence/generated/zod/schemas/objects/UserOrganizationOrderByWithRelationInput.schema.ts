@@ -9,6 +9,7 @@ const makeSchema = () => z.object({
   userId: SortOrderSchema.optional(),
   organizationId: SortOrderSchema.optional(),
   isCurrent: SortOrderSchema.optional(),
+  isAdmin: SortOrderSchema.optional(),
   user: z.lazy(() => UserOrderByWithRelationInputObjectSchema).optional(),
   organization: z.lazy(() => OrganizationOrderByWithRelationInputObjectSchema).optional()
 }).strict();

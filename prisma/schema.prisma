@@ -38,6 +38,7 @@ model UserOrganization {
   userId         Int
   organizationId Int
   isCurrent      Boolean      @default(false)
+  isAdmin        Boolean      @default(false)
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 

@@ -3288,6 +3288,7 @@ export namespace Prisma {
     userId: number | null
     organizationId: number | null
     isCurrent: boolean | null
+    isAdmin: boolean | null
   }
 
   export type UserOrganizationMaxAggregateOutputType = {
@@ -3295,6 +3296,7 @@ export namespace Prisma {
     userId: number | null
     organizationId: number | null
     isCurrent: boolean | null
+    isAdmin: boolean | null
   }
 
   export type UserOrganizationCountAggregateOutputType = {
@@ -3302,6 +3304,7 @@ export namespace Prisma {
     userId: number
     organizationId: number
     isCurrent: number
+    isAdmin: number
     _all: number
   }
 
@@ -3323,6 +3326,7 @@ export namespace Prisma {
     userId?: true
     organizationId?: true
     isCurrent?: true
+    isAdmin?: true
   }
 
   export type UserOrganizationMaxAggregateInputType = {
@@ -3330,6 +3334,7 @@ export namespace Prisma {
     userId?: true
     organizationId?: true
     isCurrent?: true
+    isAdmin?: true
   }
 
   export type UserOrganizationCountAggregateInputType = {
@@ -3337,6 +3342,7 @@ export namespace Prisma {
     userId?: true
     organizationId?: true
     isCurrent?: true
+    isAdmin?: true
     _all?: true
   }
 
@@ -3431,6 +3437,7 @@ export namespace Prisma {
     userId: number
     organizationId: number
     isCurrent: boolean
+    isAdmin: boolean
     _count: UserOrganizationCountAggregateOutputType | null
     _avg: UserOrganizationAvgAggregateOutputType | null
     _sum: UserOrganizationSumAggregateOutputType | null
@@ -3457,6 +3464,7 @@ export namespace Prisma {
     userId?: boolean
     organizationId?: boolean
     isCurrent?: boolean
+    isAdmin?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     organization?: boolean | OrganizationDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["userOrganization"]>
@@ -3466,6 +3474,7 @@ export namespace Prisma {
     userId?: boolean
     organizationId?: boolean
     isCurrent?: boolean
+    isAdmin?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     organization?: boolean | OrganizationDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["userOrganization"]>
@@ -3475,6 +3484,7 @@ export namespace Prisma {
     userId?: boolean
     organizationId?: boolean
     isCurrent?: boolean
+    isAdmin?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     organization?: boolean | OrganizationDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["userOrganization"]>
@@ -3484,9 +3494,10 @@ export namespace Prisma {
     userId?: boolean
     organizationId?: boolean
     isCurrent?: boolean
+    isAdmin?: boolean
   }
 
-  export type UserOrganizationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "organizationId" | "isCurrent", ExtArgs["result"]["userOrganization"]>
+  export type UserOrganizationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "organizationId" | "isCurrent" | "isAdmin", ExtArgs["result"]["userOrganization"]>
   export type UserOrganizationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     organization?: boolean | OrganizationDefaultArgs<ExtArgs>
@@ -3511,6 +3522,7 @@ export namespace Prisma {
       userId: number
       organizationId: number
       isCurrent: boolean
+      isAdmin: boolean
     }, ExtArgs["result"]["userOrganization"]>
     composites: {}
   }
@@ -3940,6 +3952,7 @@ export namespace Prisma {
     readonly userId: FieldRef<"UserOrganization", 'Int'>
     readonly organizationId: FieldRef<"UserOrganization", 'Int'>
     readonly isCurrent: FieldRef<"UserOrganization", 'Boolean'>
+    readonly isAdmin: FieldRef<"UserOrganization", 'Boolean'>
   }
     
 
@@ -4390,7 +4403,8 @@ export namespace Prisma {
     id: 'id',
     userId: 'userId',
     organizationId: 'organizationId',
-    isCurrent: 'isCurrent'
+    isCurrent: 'isCurrent',
+    isAdmin: 'isAdmin'
   };
 
   export type UserOrganizationScalarFieldEnum = (typeof UserOrganizationScalarFieldEnum)[keyof typeof UserOrganizationScalarFieldEnum]
@@ -4579,6 +4593,7 @@ export namespace Prisma {
     userId?: IntFilter<"UserOrganization"> | number
     organizationId?: IntFilter<"UserOrganization"> | number
     isCurrent?: BoolFilter<"UserOrganization"> | boolean
+    isAdmin?: BoolFilter<"UserOrganization"> | boolean
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
   }
@@ -4588,6 +4603,7 @@ export namespace Prisma {
     userId?: SortOrder
     organizationId?: SortOrder
     isCurrent?: SortOrder
+    isAdmin?: SortOrder
     user?: UserOrderByWithRelationInput
     organization?: OrganizationOrderByWithRelationInput
   }
@@ -4601,6 +4617,7 @@ export namespace Prisma {
     userId?: IntFilter<"UserOrganization"> | number
     organizationId?: IntFilter<"UserOrganization"> | number
     isCurrent?: BoolFilter<"UserOrganization"> | boolean
+    isAdmin?: BoolFilter<"UserOrganization"> | boolean
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
   }, "id" | "userId_organizationId">
@@ -4610,6 +4627,7 @@ export namespace Prisma {
     userId?: SortOrder
     organizationId?: SortOrder
     isCurrent?: SortOrder
+    isAdmin?: SortOrder
     _count?: UserOrganizationCountOrderByAggregateInput
     _avg?: UserOrganizationAvgOrderByAggregateInput
     _max?: UserOrganizationMaxOrderByAggregateInput
@@ -4625,6 +4643,7 @@ export namespace Prisma {
     userId?: IntWithAggregatesFilter<"UserOrganization"> | number
     organizationId?: IntWithAggregatesFilter<"UserOrganization"> | number
     isCurrent?: BoolWithAggregatesFilter<"UserOrganization"> | boolean
+    isAdmin?: BoolWithAggregatesFilter<"UserOrganization"> | boolean
   }
 
   export type UserCreateInput = {
@@ -4715,6 +4734,7 @@ export namespace Prisma {
 
   export type UserOrganizationCreateInput = {
     isCurrent?: boolean
+    isAdmin?: boolean
     user: UserCreateNestedOneWithoutOrganizationsInput
     organization: OrganizationCreateNestedOneWithoutMembersInput
   }
@@ -4724,10 +4744,12 @@ export namespace Prisma {
     userId: number
     organizationId: number
     isCurrent?: boolean
+    isAdmin?: boolean
   }
 
   export type UserOrganizationUpdateInput = {
     isCurrent?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     user?: UserUpdateOneRequiredWithoutOrganizationsNestedInput
     organization?: OrganizationUpdateOneRequiredWithoutMembersNestedInput
   }
@@ -4737,6 +4759,7 @@ export namespace Prisma {
     userId?: IntFieldUpdateOperationsInput | number
     organizationId?: IntFieldUpdateOperationsInput | number
     isCurrent?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type UserOrganizationCreateManyInput = {
@@ -4744,10 +4767,12 @@ export namespace Prisma {
     userId: number
     organizationId: number
     isCurrent?: boolean
+    isAdmin?: boolean
   }
 
   export type UserOrganizationUpdateManyMutationInput = {
     isCurrent?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type UserOrganizationUncheckedUpdateManyInput = {
@@ -4755,6 +4780,7 @@ export namespace Prisma {
     userId?: IntFieldUpdateOperationsInput | number
     organizationId?: IntFieldUpdateOperationsInput | number
     isCurrent?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type IntFilter<$PrismaModel = never> = {
@@ -4942,6 +4968,7 @@ export namespace Prisma {
     userId?: SortOrder
     organizationId?: SortOrder
     isCurrent?: SortOrder
+    isAdmin?: SortOrder
   }
 
   export type UserOrganizationAvgOrderByAggregateInput = {
@@ -4955,6 +4982,7 @@ export namespace Prisma {
     userId?: SortOrder
     organizationId?: SortOrder
     isCurrent?: SortOrder
+    isAdmin?: SortOrder
   }
 
   export type UserOrganizationMinOrderByAggregateInput = {
@@ -4962,6 +4990,7 @@ export namespace Prisma {
     userId?: SortOrder
     organizationId?: SortOrder
     isCurrent?: SortOrder
+    isAdmin?: SortOrder
   }
 
   export type UserOrganizationSumOrderByAggregateInput = {
@@ -5236,6 +5265,7 @@ export namespace Prisma {
 
   export type UserOrganizationCreateWithoutUserInput = {
     isCurrent?: boolean
+    isAdmin?: boolean
     organization: OrganizationCreateNestedOneWithoutMembersInput
   }
 
@@ -5243,6 +5273,7 @@ export namespace Prisma {
     id?: number
     organizationId: number
     isCurrent?: boolean
+    isAdmin?: boolean
   }
 
   export type UserOrganizationCreateOrConnectWithoutUserInput = {
@@ -5279,10 +5310,12 @@ export namespace Prisma {
     userId?: IntFilter<"UserOrganization"> | number
     organizationId?: IntFilter<"UserOrganization"> | number
     isCurrent?: BoolFilter<"UserOrganization"> | boolean
+    isAdmin?: BoolFilter<"UserOrganization"> | boolean
   }
 
   export type UserOrganizationCreateWithoutOrganizationInput = {
     isCurrent?: boolean
+    isAdmin?: boolean
     user: UserCreateNestedOneWithoutOrganizationsInput
   }
 
@@ -5290,6 +5323,7 @@ export namespace Prisma {
     id?: number
     userId: number
     isCurrent?: boolean
+    isAdmin?: boolean
   }
 
   export type UserOrganizationCreateOrConnectWithoutOrganizationInput = {
@@ -5398,10 +5432,12 @@ export namespace Prisma {
     id?: number
     organizationId: number
     isCurrent?: boolean
+    isAdmin?: boolean
   }
 
   export type UserOrganizationUpdateWithoutUserInput = {
     isCurrent?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     organization?: OrganizationUpdateOneRequiredWithoutMembersNestedInput
   }
 
@@ -5409,22 +5445,26 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     organizationId?: IntFieldUpdateOperationsInput | number
     isCurrent?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type UserOrganizationUncheckedUpdateManyWithoutUserInput = {
     id?: IntFieldUpdateOperationsInput | number
     organizationId?: IntFieldUpdateOperationsInput | number
     isCurrent?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type UserOrganizationCreateManyOrganizationInput = {
     id?: number
     userId: number
     isCurrent?: boolean
+    isAdmin?: boolean
   }
 
   export type UserOrganizationUpdateWithoutOrganizationInput = {
     isCurrent?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     user?: UserUpdateOneRequiredWithoutOrganizationsNestedInput
   }
 
@@ -5432,12 +5472,14 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     userId?: IntFieldUpdateOperationsInput | number
     isCurrent?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type UserOrganizationUncheckedUpdateManyWithoutOrganizationInput = {
     id?: IntFieldUpdateOperationsInput | number
     userId?: IntFieldUpdateOperationsInput | number
     isCurrent?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
   }
 
 

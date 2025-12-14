@@ -4,6 +4,7 @@ export const UserOrganizationAggregateResultSchema = z.object({  _count: z.objec
     userId: z.number(),
     organizationId: z.number(),
     isCurrent: z.number(),
+    isAdmin: z.number(),
     user: z.number(),
     organization: z.number()
   }).optional(),

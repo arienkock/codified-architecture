@@ -4,6 +4,7 @@ import { OrganizationCreateNestedOneWithoutMembersInputObjectSchema as Organizat
 
 const makeSchema = () => z.object({
   isCurrent: z.boolean().optional(),
+  isAdmin: z.boolean().optional(),
   organization: z.lazy(() => OrganizationCreateNestedOneWithoutMembersInputObjectSchema)
 }).strict();
 export const UserOrganizationCreateWithoutUserInputObjectSchema: z.ZodType<Prisma.UserOrganizationCreateWithoutUserInput> = makeSchema() as unknown as z.ZodType<Prisma.UserOrganizationCreateWithoutUserInput>;

@@ -8,6 +8,7 @@ const makeSchema = () => z.object({
   userId: z.boolean().optional(),
   organizationId: z.boolean().optional(),
   isCurrent: z.boolean().optional(),
+  isAdmin: z.boolean().optional(),
   user: z.union([z.boolean(), z.lazy(() => UserArgsObjectSchema)]).optional(),
   organization: z.union([z.boolean(), z.lazy(() => OrganizationArgsObjectSchema)]).optional()
 }).strict();

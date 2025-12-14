@@ -7,7 +7,8 @@ const makeSchema = () => z.object({
   id: z.union([z.number().int(), z.lazy(() => IntFieldUpdateOperationsInputObjectSchema)]).optional(),
   userId: z.union([z.number().int(), z.lazy(() => IntFieldUpdateOperationsInputObjectSchema)]).optional(),
   organizationId: z.union([z.number().int(), z.lazy(() => IntFieldUpdateOperationsInputObjectSchema)]).optional(),
-  isCurrent: z.union([z.boolean(), z.lazy(() => BoolFieldUpdateOperationsInputObjectSchema)]).optional()
+  isCurrent: z.union([z.boolean(), z.lazy(() => BoolFieldUpdateOperationsInputObjectSchema)]).optional(),
+  isAdmin: z.union([z.boolean(), z.lazy(() => BoolFieldUpdateOperationsInputObjectSchema)]).optional()
 }).strict();
 export const UserOrganizationUncheckedUpdateManyInputObjectSchema: z.ZodType<Prisma.UserOrganizationUncheckedUpdateManyInput> = makeSchema() as unknown as z.ZodType<Prisma.UserOrganizationUncheckedUpdateManyInput>;
 export const UserOrganizationUncheckedUpdateManyInputObjectZodSchema = makeSchema();

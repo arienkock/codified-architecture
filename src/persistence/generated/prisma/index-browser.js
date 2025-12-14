@@ -136,7 +136,8 @@ exports.Prisma.UserOrganizationScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   organizationId: 'organizationId',
-  isCurrent: 'isCurrent'
+  isCurrent: 'isCurrent',
+  isAdmin: 'isAdmin'
 };
 
 exports.Prisma.SortOrder = {

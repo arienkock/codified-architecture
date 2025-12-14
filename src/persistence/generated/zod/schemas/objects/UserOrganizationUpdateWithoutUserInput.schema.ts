@@ -5,6 +5,7 @@ import { OrganizationUpdateOneRequiredWithoutMembersNestedInputObjectSchema as O
 
 const makeSchema = () => z.object({
   isCurrent: z.union([z.boolean(), z.lazy(() => BoolFieldUpdateOperationsInputObjectSchema)]).optional(),
+  isAdmin: z.union([z.boolean(), z.lazy(() => BoolFieldUpdateOperationsInputObjectSchema)]).optional(),
   organization: z.lazy(() => OrganizationUpdateOneRequiredWithoutMembersNestedInputObjectSchema).optional()
 }).strict();
 export const UserOrganizationUpdateWithoutUserInputObjectSchema: z.ZodType<Prisma.UserOrganizationUpdateWithoutUserInput> = makeSchema() as unknown as z.ZodType<Prisma.UserOrganizationUpdateWithoutUserInput>;

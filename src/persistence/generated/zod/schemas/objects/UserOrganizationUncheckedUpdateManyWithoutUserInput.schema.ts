@@ -6,7 +6,8 @@ import { BoolFieldUpdateOperationsInputObjectSchema as BoolFieldUpdateOperations
 const makeSchema = () => z.object({
   id: z.union([z.number().int(), z.lazy(() => IntFieldUpdateOperationsInputObjectSchema)]).optional(),
   organizationId: z.union([z.number().int(), z.lazy(() => IntFieldUpdateOperationsInputObjectSchema)]).optional(),
-  isCurrent: z.union([z.boolean(), z.lazy(() => BoolFieldUpdateOperationsInputObjectSchema)]).optional()
+  isCurrent: z.union([z.boolean(), z.lazy(() => BoolFieldUpdateOperationsInputObjectSchema)]).optional(),
+  isAdmin: z.union([z.boolean(), z.lazy(() => BoolFieldUpdateOperationsInputObjectSchema)]).optional()
 }).strict();
 export const UserOrganizationUncheckedUpdateManyWithoutUserInputObjectSchema: z.ZodType<Prisma.UserOrganizationUncheckedUpdateManyWithoutUserInput> = makeSchema() as unknown as z.ZodType<Prisma.UserOrganizationUncheckedUpdateManyWithoutUserInput>;
 export const UserOrganizationUncheckedUpdateManyWithoutUserInputObjectZodSchema = makeSchema();

@@ -10,7 +10,8 @@ const userorganizationscalarwhereinputSchema = z.object({
   id: z.union([z.lazy(() => IntFilterObjectSchema), z.number().int()]).optional(),
   userId: z.union([z.lazy(() => IntFilterObjectSchema), z.number().int()]).optional(),
   organizationId: z.union([z.lazy(() => IntFilterObjectSchema), z.number().int()]).optional(),
-  isCurrent: z.union([z.lazy(() => BoolFilterObjectSchema), z.boolean()]).optional()
+  isCurrent: z.union([z.lazy(() => BoolFilterObjectSchema), z.boolean()]).optional(),
+  isAdmin: z.union([z.lazy(() => BoolFilterObjectSchema), z.boolean()]).optional()
 }).strict();
 export const UserOrganizationScalarWhereInputObjectSchema: z.ZodType<Prisma.UserOrganizationScalarWhereInput> = userorganizationscalarwhereinputSchema as unknown as z.ZodType<Prisma.UserOrganizationScalarWhereInput>;
 export const UserOrganizationScalarWhereInputObjectZodSchema = userorganizationscalarwhereinputSchema;

@@ -10,7 +10,8 @@ const userorganizationscalarwherewithaggregatesinputSchema = z.object({
   id: z.union([z.lazy(() => IntWithAggregatesFilterObjectSchema), z.number().int()]).optional(),
   userId: z.union([z.lazy(() => IntWithAggregatesFilterObjectSchema), z.number().int()]).optional(),
   organizationId: z.union([z.lazy(() => IntWithAggregatesFilterObjectSchema), z.number().int()]).optional(),
-  isCurrent: z.union([z.lazy(() => BoolWithAggregatesFilterObjectSchema), z.boolean()]).optional()
+  isCurrent: z.union([z.lazy(() => BoolWithAggregatesFilterObjectSchema), z.boolean()]).optional(),
+  isAdmin: z.union([z.lazy(() => BoolWithAggregatesFilterObjectSchema), z.boolean()]).optional()
 }).strict();
 export const UserOrganizationScalarWhereWithAggregatesInputObjectSchema: z.ZodType<Prisma.UserOrganizationScalarWhereWithAggregatesInput> = userorganizationscalarwherewithaggregatesinputSchema as unknown as z.ZodType<Prisma.UserOrganizationScalarWhereWithAggregatesInput>;
 export const UserOrganizationScalarWhereWithAggregatesInputObjectZodSchema = userorganizationscalarwherewithaggregatesinputSchema;

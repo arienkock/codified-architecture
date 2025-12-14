@@ -15,6 +15,7 @@ const userorganizationwhereinputSchema = z.object({
   userId: z.union([z.lazy(() => IntFilterObjectSchema), z.number().int()]).optional(),
   organizationId: z.union([z.lazy(() => IntFilterObjectSchema), z.number().int()]).optional(),
   isCurrent: z.union([z.lazy(() => BoolFilterObjectSchema), z.boolean()]).optional(),
+  isAdmin: z.union([z.lazy(() => BoolFilterObjectSchema), z.boolean()]).optional(),
   user: z.union([z.lazy(() => UserScalarRelationFilterObjectSchema), z.lazy(() => UserWhereInputObjectSchema)]).optional(),
   organization: z.union([z.lazy(() => OrganizationScalarRelationFilterObjectSchema), z.lazy(() => OrganizationWhereInputObjectSchema)]).optional()
 }).strict();

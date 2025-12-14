@@ -6,7 +6,8 @@ const makeSchema = () => z.object({
   id: SortOrderSchema.optional(),
   userId: SortOrderSchema.optional(),
   organizationId: SortOrderSchema.optional(),
-  isCurrent: SortOrderSchema.optional()
+  isCurrent: SortOrderSchema.optional(),
+  isAdmin: SortOrderSchema.optional()
 }).strict();
 export const UserOrganizationCountOrderByAggregateInputObjectSchema: z.ZodType<Prisma.UserOrganizationCountOrderByAggregateInput> = makeSchema() as unknown as z.ZodType<Prisma.UserOrganizationCountOrderByAggregateInput>;
 export const UserOrganizationCountOrderByAggregateInputObjectZodSchema = makeSchema();
