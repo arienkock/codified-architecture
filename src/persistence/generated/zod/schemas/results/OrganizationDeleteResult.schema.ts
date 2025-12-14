@@ -1,7 +1,0 @@
-import { z } from 'zod';
-export const OrganizationDeleteResultSchema = z.nullable(z.object({
-  id: z.number().int(),
-  name: z.string(),
-  members: z.array(z.unknown()),
-  invitations: z.array(z.unknown())
-}));
