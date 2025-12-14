@@ -178,13 +178,16 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
             }
             return res.status(400).json({ message: "Invalid request" } satisfies GenericErrorResponse);
         }
-        repo.delete({
+        repo.deleteMany({
             where: {
-                 id: requestParams.id,
-                ...securityFilter,
+                AND: [{
+                    id: requestParams.id,
+                }, {
+                    ...securityFilter,
+                }]
             },
         }).then((d: any) => {
-            if (d) {
+            if (d.count > 0) {
                 res.json({ message: "Deleted" });
             } else {
                 return res.status(404).json({ message: "Not found" } satisfies GenericErrorResponse);
