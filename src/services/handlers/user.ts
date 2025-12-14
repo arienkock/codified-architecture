@@ -86,6 +86,7 @@ async function createPersonalOrganization(createdUser: any, db: PrismaClient, se
             userId: createdUser.id,
             organizationId: organization.id,
             isCurrent: true,
+            isAdmin: true,
         },
     });
 }
