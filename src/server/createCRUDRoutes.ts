@@ -160,15 +160,18 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
             }
             return res.status(400).json({ message: "Invalid request" } satisfies GenericErrorResponse);
         }
-        repo.update({
+        repo.updateManyAndReturn({
             data: data as any,
             where: {
-                id: requestParams.id,
-                ...securityFilter,
+                AND: [{
+                    id: requestParams.id,
+                }, {
+                    ...securityFilter,
+                }]
             },
-        }).then((d: any) => {
-            if (d) {
-                res.json(resourceDefinition.read.responseSchema.parse(d))
+        }).then((updated: any[]) => {
+            if (updated.length > 0) {
+                res.json(resourceDefinition.read.responseSchema.parse(updated[0]))
             } else {
                 return res.status(404).json({ message: "Not found" } satisfies GenericErrorResponse);
             }
