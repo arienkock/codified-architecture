@@ -11,8 +11,8 @@ const internalFields: Record<string, true> = {
 }
 
 const userResourceDefinition: ResourceDefinition = {
-    name: "User",
-    namePlural: "Users",
+    name: "user",
+    namePlural: "users",
     create: {
         requestBodySchema: UserCreateInputObjectZodSchema.omit(internalFields).extend({ password: z.string() }).strict(),
         requestBodyTransformer: hashPasswordTransformer,
