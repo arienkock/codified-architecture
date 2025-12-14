@@ -14,11 +14,27 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
         } catch (error) {
             return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);
         }
-        let paginationParams: { page?: number; pageSize?: number };
+        let paginationParams: { page?: number | undefined; pageSize?: number | undefined };
         let where: any;
         try {
             paginationParams = paginationParamsSchema.parse(req.query);
-            where = resourceDefinition.read.securityFilterGenerator(req.securityContext, {} as any);
+            // Fetch current organization ID for the user if authenticated
+            let enhancedSecurityContext = { ...req.securityContext };
+            if (req.securityContext.currentUserId && !req.securityContext.isAdmin) {
+                const currentOrg = await db.userOrganization.findFirst({
+                    where: {
+                        userId: parseInt(req.securityContext.currentUserId),
+                        isCurrent: true,
+                    },
+                    select: {
+                        organizationId: true,
+                    },
+                });
+                if (currentOrg) {
+                    enhancedSecurityContext.currentOrganizationId = currentOrg.organizationId;
+                }
+            }
+            where = resourceDefinition.read.securityFilterGenerator(enhancedSecurityContext, {} as any);
         } catch (error) {
             if (error instanceof z.ZodError) {
                 return res.status(400).json({ message: "Invalid request", errors: error.issues } satisfies GenericErrorResponse);

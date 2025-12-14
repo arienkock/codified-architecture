@@ -15,7 +15,7 @@ describe("createCRUDRoutes", () => {
         create: jest.Mock;
         update: jest.Mock;
     };
-    let db: { $transaction: jest.Mock };
+    let db: { $transaction: jest.Mock; userOrganization?: { findFirst: jest.Mock } };
     let resourceDefinition: ResourceDefinition;
 
     beforeEach(() => {
@@ -27,6 +27,9 @@ describe("createCRUDRoutes", () => {
         };
         db = {
             $transaction: jest.fn((queries: Promise<any>[]) => Promise.all(queries)),
+            userOrganization: {
+                findFirst: jest.fn().mockResolvedValue(null),
+            },
         };
         const securityFilterGenerator = jest.fn((ctx: any) => ({ ownerId: ctx.currentUserId }));
 

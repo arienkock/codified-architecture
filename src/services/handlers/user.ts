@@ -62,6 +62,18 @@ function securityFilterGenerator(securityContext: SecurityContext, requestParams
     if (securityContext.isAdmin) {
         return {};
     }
+    // For collection endpoint (no id in requestParams), filter by current organization
+    const params = requestParams as { id?: number };
+    if (!params.id && securityContext.currentOrganizationId) {
+        return {
+            organizations: {
+                some: {
+                    organizationId: securityContext.currentOrganizationId,
+                },
+            },
+        };
+    }
+    // For single resource endpoint, still filter by user ID
     return {
         id: securityContext.currentUserId && parseInt(securityContext.currentUserId),
     };
