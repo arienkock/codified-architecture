@@ -27,7 +27,39 @@ export function createServer(db: PrismaClient, port?: number) {
         res.json(document);
     });
     // Serve Swagger UI static assets
-    app.use("/swagger-ui", express.static(getAbsoluteFSPath()));
+    app.use("/swagger/assets", express.static(getAbsoluteFSPath()));
+    // Serve Swagger UI HTML page with spec loaded from /openapi.json
+    app.get("/swagger", (req, res) => {
+        res.send(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>API Documentation</title>
+    <link rel="stylesheet" type="text/css" href="/swagger/assets/swagger-ui.css" />
+    <link rel="stylesheet" type="text/css" href="/swagger/assets/index.css" />
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    <script src="/swagger/assets/swagger-ui-bundle.js"></script>
+    <script src="/swagger/assets/swagger-ui-standalone-preset.js"></script>
+    <script>
+        window.onload = function() {
+            window.ui = SwaggerUIBundle({
+                url: "/openapi.json",
+                dom_id: "#swagger-ui",
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                layout: "StandaloneLayout"
+            });
+        };
+    </script>
+</body>
+</html>
+        `);
+    });
 
     app.get('/', (req, res) => {
         res.send('//TODO: Add a welcome page');
