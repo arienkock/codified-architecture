@@ -15,6 +15,7 @@ const organizationResourceDefinition: ResourceDefinition = {
         validators: [],
         authorizers: [
             authenticationRequiredAuthorizer,
+            adminRequiredAuthorizer,
         ],
         postCreateHook: addCreatorAsAdmin,
     },
@@ -71,6 +72,13 @@ function securityFilterGenerator(securityContext: SecurityContext, requestParams
 function authenticationRequiredAuthorizer(securityContext: SecurityContext): Promise<void> {
     if (!securityContext.currentUserId) {
         throw new Error('Authentication required');
+    }
+    return Promise.resolve();
+}
+
+function adminRequiredAuthorizer(securityContext: SecurityContext): Promise<void> {
+    if (!securityContext.isAdmin) {
+        throw new Error('Admin access required');
     }
     return Promise.resolve();
 }
