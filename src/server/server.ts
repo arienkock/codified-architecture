@@ -8,6 +8,7 @@ import * as jose from 'jose'
 import { JWT_SECRET } from "../config.js";
 import cookieParser from "cookie-parser";
 import { rateLimitMiddleware } from "./rateLimitMiddleware.js";
+import { getAbsoluteFSPath } from "swagger-ui-dist";
 
 const secret = new TextEncoder().encode(
     JWT_SECRET
@@ -25,6 +26,9 @@ export function createServer(db: PrismaClient, port?: number) {
     app.get("/openapi.json", (req, res) => {
         res.json(document);
     });
+    // Serve Swagger UI static assets
+    app.use("/swagger-ui", express.static(getAbsoluteFSPath()));
+
     app.get('/', (req, res) => {
         res.send('//TODO: Add a welcome page');
     });

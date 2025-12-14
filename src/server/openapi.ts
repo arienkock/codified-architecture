@@ -12,8 +12,8 @@ const document: ReturnType<typeof createDocument> = createDocument({
         version: "1.0.0",
     },
     paths: {
-        [`/${userResourceDefinition.namePlural}`]: CollectionResourcePaths(userResourceDefinition),
-        [`/${userResourceDefinition.namePlural}/{id}`]: SingleResourcePaths(userResourceDefinition),
+        [`/${userResourceDefinition.namePlural.toLowerCase()}`]: CollectionResourcePaths(userResourceDefinition),
+        [`/${userResourceDefinition.namePlural.toLowerCase()}/{id}`]: SingleResourcePaths(userResourceDefinition),
     },
 });
 
