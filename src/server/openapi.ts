@@ -1,7 +1,7 @@
 import z from "zod";
 import { createDocument, ZodOpenApiOperationObject, ZodOpenApiPathItemObject } from "zod-openapi";
 import { ResourceDefinition } from "../common/resource-definition.js";
-import { createPaginatedResponseSchema } from "../common/pagination.js";
+import { createPaginatedResponseSchema, paginationParamsSchema } from "../common/pagination.js";
 
 import userResourceDefinition from "../services/handlers/user.js";
 
@@ -36,6 +36,9 @@ function SingleResourcePaths(resourceDefinition: ResourceDefinition): ZodOpenApi
 function ReadResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiOperationObject {
     return {
         summary: `Get a ${resourceDefinition.name} by ID`,
+        requestParams: {
+            path: resourceDefinition.read.requestParamsSchema as z.ZodObject<any>,
+        },
         responses: {
             200: {
                 description: "OK",
@@ -52,6 +55,9 @@ function ReadResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiOpe
 function UpdateResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiOperationObject {
     return {
         summary: `Update a ${resourceDefinition.name} by ID`,
+        requestParams: {
+            path: resourceDefinition.update.requestParamsSchema as z.ZodObject<any>,
+        },
         requestBody: {
             content: {
                 "application/json": {
@@ -75,6 +81,9 @@ function UpdateResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiO
 function DeleteResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiOperationObject {
     return {
         summary: `Delete a ${resourceDefinition.name} by ID`,
+        requestParams: {
+            path: resourceDefinition.delete.requestParamsSchema as z.ZodObject<any>,
+        },
         responses: {
             200: {
                 description: "OK",
@@ -114,6 +123,9 @@ function CreateResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiO
 function ReadCollectionResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiOperationObject {
     return {
         summary: `Get all ${resourceDefinition.namePlural}`,
+        requestParams: {
+            query: paginationParamsSchema,
+        },
         responses: {
             200: {
                 description: "OK",
