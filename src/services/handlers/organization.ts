@@ -35,12 +35,13 @@ const organizationResourceDefinition: ResourceDefinition = {
         validators: [],
         authorizers: [
             authenticationRequiredAuthorizer,
-            organizationUpdateAuthorizer,
+            organizationAdministrationAuthorizer,
         ],
     },
     delete: {
         authorizers: [
             authenticationRequiredAuthorizer,
+            organizationAdministrationAuthorizer,
         ],
         requestParamsSchema: z.object({ id: z.coerce.number().int() }),
         securityFilterGenerator: securityFilterGenerator,
@@ -85,7 +86,7 @@ function adminRequiredAuthorizer(securityContext: SecurityContext, db: PrismaCli
     return Promise.resolve();
 }
 
-async function organizationUpdateAuthorizer(
+async function organizationAdministrationAuthorizer(
     securityContext: SecurityContext,
     db: PrismaClient,
     requestParams: { id: number }
