@@ -2,6 +2,7 @@ import z from "zod";
 import { ResourceDefinition } from "../../common/resource-definition.js"
 import { OrganizationCreateInputObjectZodSchema, OrganizationCreateResultSchema, OrganizationUpdateInputObjectZodSchema } from "../../persistence/generated/zod/schemas/index.js";
 import { SecurityContext } from "../../common/security.js";
+import { PrismaClient } from "../../persistence/generated/prisma";
 
 const internalFields: Record<string, true> = {
     members: true,
@@ -34,6 +35,7 @@ const organizationResourceDefinition: ResourceDefinition = {
         validators: [],
         authorizers: [
             authenticationRequiredAuthorizer,
+            organizationUpdateAuthorizer,
         ],
     },
     delete: {
@@ -69,17 +71,47 @@ function securityFilterGenerator(securityContext: SecurityContext, requestParams
     };
 }
 
-function authenticationRequiredAuthorizer(securityContext: SecurityContext): Promise<void> {
+function authenticationRequiredAuthorizer(securityContext: SecurityContext, db: PrismaClient, requestParams: any): Promise<void> {
     if (!securityContext.currentUserId) {
         throw new Error('Authentication required');
     }
     return Promise.resolve();
 }
 
-function adminRequiredAuthorizer(securityContext: SecurityContext): Promise<void> {
+function adminRequiredAuthorizer(securityContext: SecurityContext, db: PrismaClient, requestParams: any): Promise<void> {
     if (!securityContext.isAdmin) {
         throw new Error('Admin access required');
     }
+    return Promise.resolve();
+}
+
+async function organizationUpdateAuthorizer(
+    securityContext: SecurityContext,
+    db: PrismaClient,
+    requestParams: { id: number }
+): Promise<void> {
+    // Global admins can update any organization
+    if (securityContext.isAdmin) {
+        return Promise.resolve();
+    }
+    
+    // Check if user is an admin of the specific organization
+    if (!securityContext.currentUserId) {
+        throw new Error('Authentication required');
+    }
+    
+    const userOrganization = await db.userOrganization.findFirst({
+        where: {
+            userId: parseInt(securityContext.currentUserId),
+            organizationId: requestParams.id,
+            isAdmin: true,
+        },
+    });
+    
+    if (!userOrganization) {
+        throw new Error('Admin access required for this organization');
+    }
+    
     return Promise.resolve();
 }
 

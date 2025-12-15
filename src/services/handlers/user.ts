@@ -1,5 +1,5 @@
 import z from "zod";
-import { ResourceDefinition } from "../../common/resource-definition.js"
+import { ResourceDefinition, PrismaTransactionClient } from "../../common/resource-definition.js"
 import { UserCreateInputObjectZodSchema, UserCreateResultSchema, UserUpdateInputObjectZodSchema } from "../../persistence/generated/zod/schemas/index.js";
 import bcrypt from "bcrypt";
 import { SecurityContext } from "../../common/security.js";
@@ -79,14 +79,14 @@ function securityFilterGenerator(securityContext: SecurityContext, requestParams
     };
 }
 
-function authenticationRequiredAuthorizer(securityContext: SecurityContext): Promise<void> {
+function authenticationRequiredAuthorizer(securityContext: SecurityContext, db: PrismaClient, requestParams: any): Promise<void> {
     if (!securityContext.currentUserId) {
         throw new Error('Authentication required');
     }
     return Promise.resolve();
 }
 
-async function createPersonalOrganization(createdUser: any, db: PrismaClient, securityContext: SecurityContext): Promise<void> {
+async function createPersonalOrganization(createdUser: any, db: PrismaTransactionClient, securityContext: SecurityContext): Promise<void> {
     const organizationName = createdUser.name ? `${createdUser.name}'s Personal` : 'Personal';
     const organization = await db.organization.create({
         data: {

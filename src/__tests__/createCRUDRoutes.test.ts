@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "@jest/globals";
+import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import express from "express";
 import { AddressInfo } from "net";
 import z from "zod";
@@ -10,12 +10,12 @@ describe("createCRUDRoutes", () => {
     const securityContext = { currentUserId: 99 };
 
     let repo: {
-        findMany: jest.Mock;
-        count: jest.Mock;
-        create: jest.Mock;
-        update: jest.Mock;
+        findMany: jest.Mock<any>;
+        count: jest.Mock<any>;
+        create: jest.Mock<any>;
+        update: jest.Mock<any>;
     };
-    let db: { $transaction: jest.Mock; userOrganization?: { findFirst: jest.Mock } };
+    let db: { $transaction: jest.Mock<any>; userOrganization?: { findFirst: jest.Mock<any> } };
     let resourceDefinition: ResourceDefinition;
 
     beforeEach(() => {
@@ -26,9 +26,9 @@ describe("createCRUDRoutes", () => {
             update: jest.fn(),
         };
         db = {
-            $transaction: jest.fn((queries: Promise<any>[]) => Promise.all(queries)),
+            $transaction: jest.fn((queries: Promise<any>[]) => Promise.all(queries)) as jest.Mock<any>,
             userOrganization: {
-                findFirst: jest.fn().mockResolvedValue(null),
+                findFirst: jest.fn().mockResolvedValue(null as any) as jest.Mock<any>,
             },
         };
         const securityFilterGenerator = jest.fn((ctx: any) => ({ ownerId: ctx.currentUserId }));
@@ -59,6 +59,7 @@ describe("createCRUDRoutes", () => {
                 authorizers: [],
             },
             delete: {
+                requestParamsSchema: z.object({ id: z.coerce.number().int() }),
                 securityFilterGenerator,
                 authorizers: [],
                 validators: [],
@@ -131,8 +132,8 @@ describe("createCRUDRoutes", () => {
 
         expect(res.status).toBe(400);
         expect(repo.create).not.toHaveBeenCalled();
-        expect(res.body.message).toBe("Invalid request");
-        expect(Array.isArray(res.body.errors)).toBe(true);
+        expect((res.body as any).message).toBe("Invalid request");
+        expect(Array.isArray((res.body as any).errors)).toBe(true);
     });
 });
 

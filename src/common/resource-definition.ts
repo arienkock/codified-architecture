@@ -2,6 +2,8 @@ import z from "zod";
 import { SecurityContext, SecurityFilterGenerator } from "./security";
 import { PrismaClient } from "../persistence/generated/prisma";
 
+export type PrismaTransactionClient = Omit<PrismaClient, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">;
+
 export interface ResourceDefinition {
     name: string;
     namePlural: string;
@@ -38,7 +40,7 @@ export interface Validator {
 }
 
 export interface Authorizer {
-    (securityContext: SecurityContext): Promise<void>
+    (securityContext: SecurityContext, db: PrismaClient, requestParams: any): Promise<void>
 }
 
 export interface Transformer {
@@ -46,5 +48,5 @@ export interface Transformer {
 }
 
 export interface PostCreateHook {
-    (createdEntity: any, db: PrismaClient, securityContext: SecurityContext): Promise<void>
+    (createdEntity: any, db: PrismaTransactionClient, securityContext: SecurityContext): Promise<void>
 }
