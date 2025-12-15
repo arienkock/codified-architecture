@@ -1,6 +1,6 @@
 import z from "zod";
 import { ResourceDefinition } from "../../common/resource-definition.js"
-import { OrganizationCreateInputObjectZodSchema, OrganizationCreateResultSchema, OrganizationUpdateInputObjectZodSchema } from "../../persistence/generated/zod/schemas/index.js";
+import { OrganizationCreateInputSchema, OrganizationResultSchema, OrganizationUpdateInputSchema } from "../../persistence/schemas/index.js";
 import { SecurityContext } from "../../common/security.js";
 import { PrismaClient } from "../../persistence/generated/prisma";
 
@@ -12,7 +12,7 @@ const organizationResourceDefinition: ResourceDefinition = {
     name: "organization",
     namePlural: "organizations",
     create: {
-        requestBodySchema: OrganizationCreateInputObjectZodSchema.omit(internalFields).strict(),
+        requestBodySchema: OrganizationCreateInputSchema.omit(internalFields).strict(),
         validators: [],
         authorizers: [
             authenticationRequiredAuthorizer,
@@ -22,14 +22,14 @@ const organizationResourceDefinition: ResourceDefinition = {
     },
     read: {
         requestParamsSchema: z.object({ id: z.coerce.number().int() }),
-        responseSchema: OrganizationCreateResultSchema.omit(internalFields),
+        responseSchema: OrganizationResultSchema.omit(internalFields),
         securityFilterGenerator: securityFilterGenerator,
         authorizers: [
             authenticationRequiredAuthorizer,
         ],
     },
     update: {
-        requestBodySchema: OrganizationUpdateInputObjectZodSchema.omit(internalFields).strict().partial(),
+        requestBodySchema: OrganizationUpdateInputSchema.omit(internalFields).strict().partial(),
         requestParamsSchema: z.object({ id: z.coerce.number().int() }),
         securityFilterGenerator: securityFilterGenerator,
         validators: [],

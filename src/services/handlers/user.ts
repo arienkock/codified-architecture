@@ -1,6 +1,6 @@
 import z from "zod";
 import { ResourceDefinition, PrismaTransactionClient } from "../../common/resource-definition.js"
-import { UserCreateInputObjectZodSchema, UserCreateResultSchema, UserUpdateInputObjectZodSchema } from "../../persistence/generated/zod/schemas/index.js";
+import { UserCreateInputSchema, UserResultSchema, UserUpdateInputSchema } from "../../persistence/schemas/index.js";
 import bcrypt from "bcrypt";
 import { SecurityContext } from "../../common/security.js";
 import { PrismaClient } from "../../persistence/generated/prisma/index.js";
@@ -14,7 +14,7 @@ const userResourceDefinition: ResourceDefinition = {
     name: "user",
     namePlural: "users",
     create: {
-        requestBodySchema: UserCreateInputObjectZodSchema.omit(internalFields).extend({ password: z.string() }).strict(),
+        requestBodySchema: UserCreateInputSchema.omit(internalFields).extend({ password: z.string() }).strict(),
         requestBodyTransformer: hashPasswordTransformer,
         validators: [],
         authorizers: [],
@@ -22,14 +22,14 @@ const userResourceDefinition: ResourceDefinition = {
     },
     read: {
         requestParamsSchema: z.object({ id: z.coerce.number().int() }),
-        responseSchema: UserCreateResultSchema.omit(internalFields),
+        responseSchema: UserResultSchema.omit(internalFields),
         securityFilterGenerator: securityFilterGenerator,
         authorizers: [
             authenticationRequiredAuthorizer,
         ],
     },
     update: {
-        requestBodySchema: UserUpdateInputObjectZodSchema.omit(internalFields).extend({ password: z.string() }).strict().partial(),
+        requestBodySchema: UserUpdateInputSchema.omit(internalFields).extend({ password: z.string() }).strict().partial(),
         requestParamsSchema: z.object({ id: z.coerce.number().int() }),
         securityFilterGenerator: securityFilterGenerator,
         validators: [],
@@ -49,7 +49,7 @@ const userResourceDefinition: ResourceDefinition = {
 
 export default userResourceDefinition;
 
-function hashPasswordTransformer(input: any): z.infer<typeof UserCreateInputObjectZodSchema> {
+function hashPasswordTransformer(input: any): z.infer<typeof UserCreateInputSchema> {
     const result = {
         ...input,
         hashedPassword: bcrypt.hashSync(input.password, 10),
