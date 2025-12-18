@@ -1,7 +1,7 @@
 import express from "express";
 import z from "zod";
 import { paginationParamsSchema, PaginatedResponse } from "../common/pagination";
-import { ResourceDefinition, PrismaTransactionClient } from "../common/resource-definition";
+import { ResourceDefinition } from "../common/resource-definition";
 import { DEFAULT_PAGE_SIZE } from "../config";
 import { PrismaClient } from "../persistence/generated/prisma";
 import { GenericErrorResponse } from "../common/errors";
@@ -75,20 +75,20 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
     router.post("/", async (req, res) => {
         let body: z.infer<typeof resourceDefinition.create.requestBodySchema>;
         try {
-            await Promise.all(resourceDefinition.create.authorizers.map((authorizer) => authorizer(req.securityContext, db, {})));
-        } catch (error) {
-            if (error instanceof Error && error.message.includes('required')) {
-                return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);
-            }
-            return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);
-        }
-        try {
             body = resourceDefinition.create.requestBodySchema.parse(req.body);
         } catch (error) {
             if (error instanceof z.ZodError) {
                 return res.status(400).json({ message: "Invalid request", errors: error.issues } satisfies GenericErrorResponse);
             }
             return res.status(400).json({ message: "Invalid request" } satisfies GenericErrorResponse);
+        }
+        try {
+            await Promise.all(resourceDefinition.create.authorizers.map((authorizer) => authorizer(req.securityContext, db, body)));
+        } catch (error) {
+            if (error instanceof Error && error.message.includes('required')) {
+                return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);
+            }
+            return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);
         }
         if (resourceDefinition.create.requestBodyTransformer) {
             body = resourceDefinition.create.requestBodyTransformer(body);
@@ -100,7 +100,7 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
                 data: body as any,
             });
             if (resourceDefinition.create.postCreateHook) {
-                await resourceDefinition.create.postCreateHook(created, tx as PrismaTransactionClient, req.securityContext);
+                await resourceDefinition.create.postCreateHook(created, tx as PrismaClient, req.securityContext);
             }
             return created;
         })

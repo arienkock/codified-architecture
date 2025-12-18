@@ -1,5 +1,5 @@
 import z from "zod";
-import { ResourceDefinition, PrismaTransactionClient } from "../../common/resource-definition.js"
+import { ResourceDefinition, IdPathParamSchema } from "../../common/resource-definition.js"
 import { UserCreateInputSchema, UserResultSchema, UserUpdateInputSchema } from "../../persistence/schemas/index.js";
 import bcrypt from "bcrypt";
 import { SecurityContext } from "../../common/security.js";
@@ -21,7 +21,7 @@ const userResourceDefinition: ResourceDefinition = {
         postCreateHook: createPersonalOrganization,
     },
     read: {
-        requestParamsSchema: z.object({ id: z.coerce.number().int() }),
+        requestParamsSchema: IdPathParamSchema,
         responseSchema: UserResultSchema.omit(internalFields),
         securityFilterGenerator: securityFilterGenerator,
         authorizers: [
@@ -30,7 +30,7 @@ const userResourceDefinition: ResourceDefinition = {
     },
     update: {
         requestBodySchema: UserUpdateInputSchema.omit(internalFields).extend({ password: z.string() }).strict().partial(),
-        requestParamsSchema: z.object({ id: z.coerce.number().int() }),
+        requestParamsSchema: IdPathParamSchema,
         securityFilterGenerator: securityFilterGenerator,
         validators: [],
         authorizers: [
@@ -41,7 +41,7 @@ const userResourceDefinition: ResourceDefinition = {
         authorizers: [
             authenticationRequiredAuthorizer,
         ],
-        requestParamsSchema: z.object({ id: z.coerce.number().int() }),
+        requestParamsSchema: IdPathParamSchema,
         securityFilterGenerator: securityFilterGenerator,
         validators: [],
     },
@@ -86,7 +86,7 @@ function authenticationRequiredAuthorizer(securityContext: SecurityContext, db: 
     return Promise.resolve();
 }
 
-async function createPersonalOrganization(createdUser: any, db: PrismaTransactionClient, securityContext: SecurityContext): Promise<void> {
+async function createPersonalOrganization(createdUser: any, db: PrismaClient, securityContext: SecurityContext): Promise<void> {
     const organizationName = createdUser.name ? `${createdUser.name}'s Personal` : 'Personal';
     const organization = await db.organization.create({
         data: {

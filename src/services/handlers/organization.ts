@@ -1,5 +1,5 @@
 import z from "zod";
-import { ResourceDefinition } from "../../common/resource-definition.js"
+import { IdPathParamSchema, ResourceDefinition } from "../../common/resource-definition.js"
 import { OrganizationCreateInputSchema, OrganizationResultSchema, OrganizationUpdateInputSchema } from "../../persistence/schemas/index.js";
 import { SecurityContext } from "../../common/security.js";
 import { PrismaClient } from "../../persistence/generated/prisma";
@@ -21,7 +21,7 @@ const organizationResourceDefinition: ResourceDefinition = {
         postCreateHook: addCreatorAsAdmin,
     },
     read: {
-        requestParamsSchema: z.object({ id: z.coerce.number().int() }),
+        requestParamsSchema: IdPathParamSchema,
         responseSchema: OrganizationResultSchema.omit(internalFields),
         securityFilterGenerator: securityFilterGenerator,
         authorizers: [
@@ -30,7 +30,7 @@ const organizationResourceDefinition: ResourceDefinition = {
     },
     update: {
         requestBodySchema: OrganizationUpdateInputSchema.omit(internalFields).strict().partial(),
-        requestParamsSchema: z.object({ id: z.coerce.number().int() }),
+        requestParamsSchema: IdPathParamSchema,
         securityFilterGenerator: securityFilterGenerator,
         validators: [],
         authorizers: [
@@ -43,7 +43,7 @@ const organizationResourceDefinition: ResourceDefinition = {
             authenticationRequiredAuthorizer,
             organizationAdministrationAuthorizer,
         ],
-        requestParamsSchema: z.object({ id: z.coerce.number().int() }),
+        requestParamsSchema: IdPathParamSchema,
         securityFilterGenerator: securityFilterGenerator,
         validators: [],
     },

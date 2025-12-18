@@ -5,6 +5,7 @@ import { createPaginatedResponseSchema, paginationParamsSchema } from "../common
 
 import userResourceDefinition from "../services/handlers/user.js";
 import organizationResourceDefinition from "../services/handlers/organization.js";
+import organizationInvitationResourceDefinition from "../services/handlers/organization-invitation.js";
 
 const document: ReturnType<typeof createDocument> = createDocument({
     openapi: "3.0.0",
@@ -17,6 +18,8 @@ const document: ReturnType<typeof createDocument> = createDocument({
         [`/${userResourceDefinition.namePlural}/{id}`]: SingleResourcePaths(userResourceDefinition),
         [`/${organizationResourceDefinition.namePlural}`]: CollectionResourcePaths(organizationResourceDefinition),
         [`/${organizationResourceDefinition.namePlural}/{id}`]: SingleResourcePaths(organizationResourceDefinition),
+        [`/${organizationInvitationResourceDefinition.namePlural}`]: CollectionResourcePaths(organizationInvitationResourceDefinition),
+        [`/${organizationInvitationResourceDefinition.namePlural}/{id}`]: SingleResourcePaths(organizationInvitationResourceDefinition),
     },
 });
 
