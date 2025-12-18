@@ -1,9 +1,10 @@
 import { PrismaClient } from "./persistence/generated/prisma/index.js";
 import { createServer } from "./server/server.js";
+import { defaultConfig } from "./config.js";
 
 
 const db = createPrismaClient();
-const server = createServer(db);
+const server = createServer(db, undefined, defaultConfig);
 
 function createPrismaClient() {
     console.log("Creating Prisma client");

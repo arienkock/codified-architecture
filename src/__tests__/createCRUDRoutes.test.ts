@@ -3,7 +3,7 @@ import express from "express";
 import { AddressInfo } from "net";
 import z from "zod";
 import { ResourceDefinition } from "../common/resource-definition.js";
-import { DEFAULT_PAGE_SIZE } from "../config.js";
+import { defaultConfig } from "../config.js";
 import { createCRUDRoutes } from "../server/createCRUDRoutes.js";
 
 describe("createCRUDRoutes", () => {
@@ -15,7 +15,7 @@ describe("createCRUDRoutes", () => {
         create: jest.Mock<any>;
         update: jest.Mock<any>;
     };
-    let db: { $transaction: jest.Mock<any>; userOrganization?: { findFirst: jest.Mock<any> } };
+    let db: any;
     let resourceDefinition: ResourceDefinition;
 
     beforeEach(() => {
@@ -26,9 +26,9 @@ describe("createCRUDRoutes", () => {
             update: jest.fn(),
         };
         db = {
-            $transaction: jest.fn((queries: Promise<any>[]) => Promise.all(queries)) as jest.Mock<any>,
+            $transaction: jest.fn((queries: Promise<any>[]) => Promise.all(queries)),
             userOrganization: {
-                findFirst: jest.fn().mockResolvedValue(null as any) as jest.Mock<any>,
+                findFirst: jest.fn(() => Promise.resolve(null as any)),
             },
         };
         const securityFilterGenerator = jest.fn((ctx: any) => ({ ownerId: ctx.currentUserId }));
@@ -74,7 +74,7 @@ describe("createCRUDRoutes", () => {
             (req as any).securityContext = securityContext;
             next();
         });
-        app.use("/widgets", createCRUDRoutes(db as any, repo as any, resourceDefinition));
+        app.use("/widgets", createCRUDRoutes(db as any, repo as any, resourceDefinition, defaultConfig));
         return app;
     };
 
@@ -100,7 +100,7 @@ describe("createCRUDRoutes", () => {
         expect(db.$transaction).toHaveBeenCalledTimes(1);
         expect(repo.findMany).toHaveBeenCalledWith({
             skip: 0,
-            take: DEFAULT_PAGE_SIZE,
+            take: defaultConfig.DEFAULT_PAGE_SIZE,
             where: { ownerId: securityContext.currentUserId },
         });
         expect(res.status).toBe(200);
@@ -108,7 +108,7 @@ describe("createCRUDRoutes", () => {
             data,
             pagination: {
                 page: 0,
-                pageSize: DEFAULT_PAGE_SIZE,
+                pageSize: defaultConfig.DEFAULT_PAGE_SIZE,
                 total: 1,
                 totalPages: 1,
                 hasNext: false,

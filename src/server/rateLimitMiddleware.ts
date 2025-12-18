@@ -1,5 +1,5 @@
 import express from "express";
-import { RATE_LIMIT_THRESHOLD } from "../config.js";
+import { AppConfig } from "../config.js";
 
 // In-memory store: IP address -> { count: number, resetAt: number }
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
@@ -8,10 +8,15 @@ const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
 const WINDOW_MS = 60 * 1000;
 
 export function rateLimitMiddleware(
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
+    config: AppConfig
 ) {
+    const { RATE_LIMIT_THRESHOLD } = config;
+
+    return function (
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction
+    ) {
     const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
     const now = Date.now();
 
@@ -57,5 +62,6 @@ export function rateLimitMiddleware(
     }
 
     next();
+    }
 }
 

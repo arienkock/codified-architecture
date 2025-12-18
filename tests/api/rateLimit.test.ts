@@ -3,16 +3,21 @@ import request from 'superagent';
 import { AddressInfo } from 'net';
 import { PrismaClient } from '../../src/persistence/generated/prisma/index.js';
 import { createServer } from '../../src/server/server.js';
-import { RATE_LIMIT_THRESHOLD } from '../../src/config.js';
+import { AppConfig, defaultConfig } from '../../src/config.js';
 
 describe('Rate Limiting', () => {
   let server: ReturnType<typeof createServer>;
   let baseUrl: string;
   let db: PrismaClient;
+  let config: AppConfig;
 
   beforeAll(async () => {
     db = new PrismaClient();
-    server = createServer(db, 0);
+    config = {
+      ...defaultConfig,
+      RATE_LIMIT_THRESHOLD: 5,
+    };
+    server = createServer(db, 0, config);
     const address = server.address() as AddressInfo;
     baseUrl = `http://127.0.0.1:${address.port}`;
   });
@@ -24,7 +29,7 @@ describe('Rate Limiting', () => {
 
   it('returns 429 status when rate limit threshold is exceeded', async () => {
     const agent = request.agent();
-    const threshold = RATE_LIMIT_THRESHOLD;
+    const threshold = config.RATE_LIMIT_THRESHOLD;
 
     // Make requests up to the threshold - these should succeed
     for (let i = 0; i < threshold; i++) {

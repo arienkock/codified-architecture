@@ -2,11 +2,11 @@ import express from "express";
 import z from "zod";
 import { paginationParamsSchema, PaginatedResponse } from "../common/pagination";
 import { ResourceDefinition } from "../common/resource-definition";
-import { DEFAULT_PAGE_SIZE } from "../config";
+import { AppConfig } from "../config.js";
 import { PrismaClient } from "../persistence/generated/prisma";
 import { GenericErrorResponse } from "../common/errors";
 
-export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition: ResourceDefinition) {
+export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition: ResourceDefinition, config: AppConfig) {
     const router = express.Router();
     router.get("/", async (req, res) => {
         try {
@@ -46,7 +46,7 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
             return res.status(400).json({ message: "Invalid request" } satisfies GenericErrorResponse);
         }
         const page = paginationParams.page ?? 0;
-        const pageSize = paginationParams.pageSize ?? DEFAULT_PAGE_SIZE;
+        const pageSize = paginationParams.pageSize ?? config.DEFAULT_PAGE_SIZE;
         return db.$transaction([
             repo.findMany({
                 skip: page * pageSize,

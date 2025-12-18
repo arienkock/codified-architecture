@@ -3,15 +3,21 @@ import request from 'superagent';
 import { AddressInfo } from 'net';
 import { PrismaClient } from '../../src/persistence/generated/prisma/index.js';
 import { createServer } from '../../src/server/server.js';
+import { AppConfig, defaultConfig } from '../../src/config.js';
 
 describe('User API', () => {
   let server: ReturnType<typeof createServer>;
   let baseUrl: string;
   let db: PrismaClient;
+  let config: AppConfig;
 
   beforeAll(async () => {
     db = new PrismaClient();
-    server = createServer(db, 0);
+    config = {
+      ...defaultConfig,
+      RATE_LIMIT_THRESHOLD: Number.MAX_SAFE_INTEGER,
+    };
+    server = createServer(db, 0, config);
     const address = server.address() as AddressInfo;
     baseUrl = `http://127.0.0.1:${address.port}`;
   });

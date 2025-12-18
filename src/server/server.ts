@@ -4,24 +4,20 @@ import { PrismaClient } from "../persistence/generated/prisma/client.js";
 import userResourceDefinition from "../services/handlers/user.js";
 import organizationResourceDefinition from "../services/handlers/organization.js";
 import organizationInvitationResourceDefinition from "../services/handlers/organization-invitation.js";
-import { createCRUDRoutes } from "./createCRUDRoutes.js";   
+import { createCRUDRoutes } from "./createCRUDRoutes.js";
 import { SecurityContext } from "../common/security.js";
 import * as jose from 'jose'
-import { JWT_SECRET } from "../config.js";
 import cookieParser from "cookie-parser";
 import { rateLimitMiddleware } from "./rateLimitMiddleware.js";
 import { getAbsoluteFSPath } from "swagger-ui-dist";
+import { AppConfig, defaultConfig } from "../config.js";
 
-const secret = new TextEncoder().encode(
-    JWT_SECRET
-)
-
-export function createServer(db: PrismaClient, port?: number) {
+export function createServer(db: PrismaClient, port: number | undefined, config: AppConfig) {
     const app = express();
 
     const resolvedPort = port ?? (process.env.PORT ? Number(process.env.PORT) : undefined) ?? 3000;
 
-    app.use(rateLimitMiddleware);
+    app.use(rateLimitMiddleware(config));
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
     app.use(cookieParser());
@@ -66,7 +62,7 @@ export function createServer(db: PrismaClient, port?: number) {
     app.get('/', (req, res) => {
         res.send('//TODO: Add a welcome page');
     });
-    setupRoutes(app, db);
+    setupRoutes(app, db, config);
     if(process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
         setupDevRoutes(app);
     }
@@ -87,14 +83,17 @@ function setupDevRoutes(app: express.Application) {
         res.redirect('/');
     });
 }
-function setupRoutes(app: express.Application, db: PrismaClient) {
+function setupRoutes(app: express.Application, db: PrismaClient, config: AppConfig) {
     app.use(securityContextMiddleware)
-    app.use(`/${userResourceDefinition.namePlural}`, createCRUDRoutes(db, db.user, userResourceDefinition));
-    app.use(`/${organizationResourceDefinition.namePlural}`, createCRUDRoutes(db, db.organization, organizationResourceDefinition));
-    app.use(`/${organizationInvitationResourceDefinition.namePlural}`, createCRUDRoutes(db, db.organizationInvitation, organizationInvitationResourceDefinition));
+    app.use(`/${userResourceDefinition.namePlural}`, createCRUDRoutes(db, db.user, userResourceDefinition, config));
+    app.use(`/${organizationResourceDefinition.namePlural}`, createCRUDRoutes(db, db.organization, organizationResourceDefinition, config));
+    app.use(`/${organizationInvitationResourceDefinition.namePlural}`, createCRUDRoutes(db, db.organizationInvitation, organizationInvitationResourceDefinition, config));
 }
 
 async function initSesssionCookieForUser(res: express.Response, user: SecurityContext) {
+    const secret = new TextEncoder().encode(
+        defaultConfig.JWT_SECRET
+    );
     res.cookie('session', await new jose.SignJWT(user as any).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().setExpirationTime('1h').sign(secret), { httpOnly: true, secure: false });
 }
 
@@ -115,6 +114,9 @@ async function securityContextMiddleware(req: express.Request, res: express.Resp
 
 async function parseSessionCookie(sessionCookie: string): Promise<SecurityContext | undefined> {
     try {
+        const secret = new TextEncoder().encode(
+            defaultConfig.JWT_SECRET
+        );
         const { payload } = await jose.jwtVerify(sessionCookie, secret) as { payload: SecurityContext };
         return payload;
     } catch (error) {
