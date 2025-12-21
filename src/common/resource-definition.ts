@@ -5,27 +5,27 @@ import { PrismaClient } from "../persistence/generated/prisma";
 export interface ResourceDefinition {
     name: string;
     namePlural: string;
-    create: {
+    create?: {
         requestBodySchema: z.ZodSchema;
         requestBodyTransformer?: Transformer;
         validators: Validator[];
         authorizers: Authorizer[];
         postCreateHook?: PostCreateHook;
     };
-    read: {
+    read?: {
         requestParamsSchema: z.ZodSchema;
         responseSchema: z.ZodSchema;
         securityFilterGenerator: SecurityFilterGenerator;
         authorizers: Authorizer[];
     };
-    update: {
+    update?: {
         requestBodySchema: z.ZodSchema;
         requestParamsSchema: z.ZodSchema;
         securityFilterGenerator: SecurityFilterGenerator;
         validators: Validator[];
         authorizers: Authorizer[];
     };
-    delete: {
+    delete?: {
         authorizers: Authorizer[];
         requestParamsSchema: z.ZodSchema;
         securityFilterGenerator: SecurityFilterGenerator;

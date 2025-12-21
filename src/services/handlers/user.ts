@@ -58,7 +58,8 @@ function hashPasswordTransformer(input: any): z.infer<typeof UserCreateInputSche
     return result;
 }
 
-function securityFilterGenerator(securityContext: SecurityContext, requestParams: z.infer<typeof userResourceDefinition.read.requestParamsSchema>): any {
+const readRequestParamsSchema = userResourceDefinition.read!.requestParamsSchema;
+function securityFilterGenerator(securityContext: SecurityContext, requestParams: z.infer<typeof readRequestParamsSchema>): any {
     if (securityContext.isAdmin) {
         return {};
     }

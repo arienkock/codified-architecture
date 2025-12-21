@@ -51,7 +51,8 @@ const organizationResourceDefinition: ResourceDefinition = {
 
 export default organizationResourceDefinition;
 
-function securityFilterGenerator(securityContext: SecurityContext, requestParams: z.infer<typeof organizationResourceDefinition.read.requestParamsSchema>): any {
+const readRequestParamsSchema = organizationResourceDefinition.read!.requestParamsSchema;
+function securityFilterGenerator(securityContext: SecurityContext, requestParams: z.infer<typeof readRequestParamsSchema>): any {
     if (securityContext.isAdmin) {
         return {};
     }

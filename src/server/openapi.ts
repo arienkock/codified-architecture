@@ -25,32 +25,42 @@ const document: ReturnType<typeof createDocument> = createDocument({
 
 
 function CollectionResourcePaths(resourceDefinition: ResourceDefinition): ZodOpenApiPathItemObject {
-    return {
-        post: CreateResourcePath(resourceDefinition),
-        get: ReadCollectionResourcePath(resourceDefinition),
+    const paths: ZodOpenApiPathItemObject = {};
+    if (resourceDefinition.create) {
+        paths.post = CreateResourcePath(resourceDefinition);
     }
+    if (resourceDefinition.read) {
+        paths.get = ReadCollectionResourcePath(resourceDefinition);
+    }
+    return paths;
 }
 
 function SingleResourcePaths(resourceDefinition: ResourceDefinition): ZodOpenApiPathItemObject {
-    return {
-        get: ReadResourcePath(resourceDefinition),
-        put: UpdateResourcePath(resourceDefinition),
-        delete: DeleteResourcePath(resourceDefinition),
+    const paths: ZodOpenApiPathItemObject = {};
+    if (resourceDefinition.read) {
+        paths.get = ReadResourcePath(resourceDefinition);
     }
+    if (resourceDefinition.update) {
+        paths.put = UpdateResourcePath(resourceDefinition);
+    }
+    if (resourceDefinition.delete) {
+        paths.delete = DeleteResourcePath(resourceDefinition);
+    }
+    return paths;
 }
 
 function ReadResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiOperationObject {
     return {
         summary: `Get a ${resourceDefinition.name} by ID`,
         requestParams: {
-            path: resourceDefinition.read.requestParamsSchema as z.ZodObject<any>,
+            path: resourceDefinition.read!.requestParamsSchema as z.ZodObject<any>,
         },
         responses: {
             200: {
                 description: "OK",
                 content: {
                     "application/json": {
-                        schema: resourceDefinition.read.responseSchema,
+                        schema: resourceDefinition.read!.responseSchema,
                     }
                 }
             }
@@ -62,12 +72,12 @@ function UpdateResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiO
     return {
         summary: `Update a ${resourceDefinition.name} by ID`,
         requestParams: {
-            path: resourceDefinition.update.requestParamsSchema as z.ZodObject<any>,
+            path: resourceDefinition.update!.requestParamsSchema as z.ZodObject<any>,
         },
         requestBody: {
             content: {
                 "application/json": {
-                    schema: resourceDefinition.update.requestBodySchema,
+                    schema: resourceDefinition.update!.requestBodySchema,
                 }
             }
         },
@@ -76,7 +86,7 @@ function UpdateResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiO
                 description: "OK",
                 content: {
                     "application/json": {
-                        schema: resourceDefinition.read.responseSchema,
+                        schema: resourceDefinition.read?.responseSchema ?? z.any(),
                     }
                 }
             }
@@ -88,14 +98,14 @@ function DeleteResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiO
     return {
         summary: `Delete a ${resourceDefinition.name} by ID`,
         requestParams: {
-            path: resourceDefinition.delete.requestParamsSchema as z.ZodObject<any>,
+            path: resourceDefinition.delete!.requestParamsSchema as z.ZodObject<any>,
         },
         responses: {
             200: {
                 description: "OK",
                 content: {
                     "application/json": {
-                        schema: resourceDefinition.read.responseSchema,
+                        schema: z.object({ message: z.string() }),
                     }
                 }
             }
@@ -109,7 +119,7 @@ function CreateResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiO
         requestBody: {
             content: {
                 "application/json": {
-                    schema: resourceDefinition.create.requestBodySchema,
+                    schema: resourceDefinition.create!.requestBodySchema,
                 }
             }
         },
@@ -118,7 +128,7 @@ function CreateResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiO
                 description: "Created",
                 content: {
                     "application/json": {
-                        schema: resourceDefinition.read.responseSchema,
+                        schema: resourceDefinition.read?.responseSchema ?? z.any(),
                     }
                 }
             }
@@ -137,7 +147,7 @@ function ReadCollectionResourcePath(resourceDefinition: ResourceDefinition): Zod
                 description: "OK",
                 content: {
                     "application/json": {
-                        schema: createPaginatedResponseSchema(resourceDefinition.read.responseSchema),
+                        schema: createPaginatedResponseSchema(resourceDefinition.read!.responseSchema),
                     }
                 }
             }
