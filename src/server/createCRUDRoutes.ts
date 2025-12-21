@@ -15,7 +15,7 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
         router.get("/", async (req, res) => {
             let enrichedParams: any = {};
             if (readOp.referenceDataLoader) {
-                const referenceData = await readOp.referenceDataLoader(db, {});
+                const referenceData = await readOp.referenceDataLoader(db, {}, req.securityContext);
                 enrichedParams = { ...enrichedParams, ...referenceData };
             }
             try {
@@ -98,7 +98,7 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
             }
             let enrichedParams: any = body;
             if (createOp.referenceDataLoader) {
-                const referenceData = await createOp.referenceDataLoader(db, body);
+                const referenceData = await createOp.referenceDataLoader(db, body, req.securityContext);
                 enrichedParams = { ...referenceData };
             }
             try {
@@ -147,7 +147,7 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
                 requestParams = readOp.requestParamsSchema.parse({ ...req.query, ...req.params });
                 let enrichedParams = requestParams;
                 if (readOp.referenceDataLoader) {
-                    const referenceData = await readOp.referenceDataLoader(db, requestParams);
+                    const referenceData = await readOp.referenceDataLoader(db, requestParams, req.securityContext);
                     enrichedParams = { ...requestParams, ...referenceData };
                 }
                 await Promise.all(readOp.authorizers.map((authorizer) => authorizer(req.securityContext, db, enrichedParams)));
@@ -193,7 +193,7 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
                 requestParams = updateOp.requestParamsSchema.parse({ ...req.query, ...req.params });
                 let enrichedParams = requestParams;
                 if (updateOp.referenceDataLoader) {
-                    const referenceData = await updateOp.referenceDataLoader(db, requestParams);
+                    const referenceData = await updateOp.referenceDataLoader(db, requestParams, req.securityContext);
                     enrichedParams = { ...requestParams, ...referenceData };
                 }
                 await Promise.all(updateOp.authorizers.map((authorizer) => authorizer(req.securityContext, db, enrichedParams)));
@@ -244,7 +244,7 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
                 requestParams = deleteOp.requestParamsSchema.parse({ ...req.query, ...req.params });
                 let enrichedParams = requestParams;
                 if (deleteOp.referenceDataLoader) {
-                    const referenceData = await deleteOp.referenceDataLoader(db, requestParams);
+                    const referenceData = await deleteOp.referenceDataLoader(db, requestParams, req.securityContext);
                     enrichedParams = { ...requestParams, ...referenceData };
                 }
                 await Promise.all(deleteOp.authorizers.map((authorizer) => authorizer(req.securityContext, db, enrichedParams)));

@@ -32,8 +32,10 @@ const organizationInvitationResourceDefinition: ResourceDefinition = {
     requestParamsSchema: IdPathParamSchema,
     responseSchema: OrganizationInvitationResultSchema.omit(internalFields),
     securityFilterGenerator,
+    referenceDataLoader: loadAdminOrganizationIds,
     authorizers: [
       authenticationRequiredAuthorizer,
+      organizationInvitationReadAuthorizer,
     ],
   },
   update: {
@@ -43,6 +45,7 @@ const organizationInvitationResourceDefinition: ResourceDefinition = {
     }).strict(),
     requestParamsSchema: IdPathParamSchema,
     securityFilterGenerator,
+    referenceDataLoader: loadAdminOrganizationIds,
     validators: [],
     authorizers: [
       authenticationRequiredAuthorizer,
@@ -56,6 +59,7 @@ const organizationInvitationResourceDefinition: ResourceDefinition = {
     ],
     requestParamsSchema: IdPathParamSchema,
     securityFilterGenerator,
+    referenceDataLoader: loadAdminOrganizationIds,
     validators: [],
   },
 };
@@ -65,29 +69,60 @@ export default organizationInvitationResourceDefinition;
 const readRequestParamsSchema = organizationInvitationResourceDefinition.read!.requestParamsSchema;
 function securityFilterGenerator(
   securityContext: SecurityContext,
-  _requestParams: z.infer<typeof readRequestParamsSchema>,
+  enrichedParams: any,
 ): any {
   if (securityContext.isAdmin) {
     return {};
   }
-  if (securityContext.currentUserId && securityContext.currentOrganizationId) {
-    // Org admins can see their own invitations plus all invitations for their current org
+
+  if (!securityContext.currentUserId) {
+    // If no user ID, return filter that matches nothing
     return {
-      OR: [
-        { userId: parseInt(securityContext.currentUserId) },
-        { organizationId: securityContext.currentOrganizationId },
-      ],
+      id: -1,
     };
   }
-  if (securityContext.currentUserId) {
-    // Regular users only see their own invitations
-    return {
-      userId: parseInt(securityContext.currentUserId),
-    };
+
+  const adminOrganizationIds = enrichedParams.adminOrganizationIds || [];
+  const userId = parseInt(securityContext.currentUserId);
+
+  // Build OR conditions: user's own invitations OR invitations for orgs where user is admin
+  const conditions: any[] = [
+    { userId },
+  ];
+
+  if (adminOrganizationIds.length > 0) {
+    conditions.push({
+      organizationId: { in: adminOrganizationIds },
+    });
   }
-  // If no user ID, return filter that matches nothing
+
   return {
-    id: -1,
+    OR: conditions,
+  };
+}
+
+async function loadAdminOrganizationIds(
+  db: PrismaClient,
+  _requestParams: any,
+  securityContext: SecurityContext,
+): Promise<Record<string, any>> {
+  // Global admins don't need org ID filtering
+  if (securityContext.isAdmin || !securityContext.currentUserId) {
+    return { adminOrganizationIds: [] };
+  }
+
+  const userOrganizations = await db.userOrganization.findMany({
+    where: {
+      userId: parseInt(securityContext.currentUserId),
+      isAdmin: true,
+    },
+    select: {
+      organizationId: true,
+    },
+  });
+
+  return {
+    adminOrganizationIds: userOrganizations.map((uo) => uo.organizationId),
   };
 }
 
@@ -100,6 +135,47 @@ function authenticationRequiredAuthorizer(
     throw new Error("Authentication required");
   }
   return Promise.resolve();
+}
+
+async function organizationInvitationReadAuthorizer(
+  securityContext: SecurityContext,
+  db: PrismaClient,
+  enrichedParams: { id: number; adminOrganizationIds?: number[] },
+): Promise<void> {
+  // Global admins can read any invitation
+  if (securityContext.isAdmin) {
+    return;
+  }
+
+  if (!securityContext.currentUserId) {
+    throw new Error("Authentication required");
+  }
+
+  const invitation = await db.organizationInvitation.findUnique({
+    where: { id: enrichedParams.id },
+    select: {
+      userId: true,
+      organizationId: true,
+    },
+  });
+
+  if (!invitation) {
+    // Let the handler surface 404 based on affected row count
+    return;
+  }
+
+  // Allow the invited user to read their own invitation
+  if (invitation.userId === parseInt(securityContext.currentUserId)) {
+    return;
+  }
+
+  // Check if user is admin of the invitation's organization
+  const adminOrganizationIds = enrichedParams.adminOrganizationIds || [];
+  if (adminOrganizationIds.includes(invitation.organizationId)) {
+    return;
+  }
+
+  throw new Error("Not allowed to read this invitation");
 }
 
 async function organizationInvitationCreationAuthorizer(
@@ -136,7 +212,7 @@ async function organizationInvitationCreationAuthorizer(
 async function organizationInvitationUpdateAuthorizer(
   securityContext: SecurityContext,
   db: PrismaClient,
-  requestParams: { id: number },
+  enrichedParams: { id: number; adminOrganizationIds?: number[] },
 ): Promise<void> {
   // Global admins can update any invitation
   if (securityContext.isAdmin) {
@@ -148,7 +224,11 @@ async function organizationInvitationUpdateAuthorizer(
   }
 
   const invitation = await db.organizationInvitation.findUnique({
-    where: { id: requestParams.id },
+    where: { id: enrichedParams.id },
+    select: {
+      userId: true,
+      organizationId: true,
+    },
   });
 
   if (!invitation) {
@@ -161,13 +241,19 @@ async function organizationInvitationUpdateAuthorizer(
     return;
   }
 
+  // Check if user is admin of the invitation's organization
+  const adminOrganizationIds = enrichedParams.adminOrganizationIds || [];
+  if (adminOrganizationIds.includes(invitation.organizationId)) {
+    return;
+  }
+
   throw new Error("Not allowed to update this invitation");
 }
 
 async function organizationInvitationDeletionAuthorizer(
   securityContext: SecurityContext,
   db: PrismaClient,
-  requestParams: { id: number },
+  enrichedParams: { id: number; adminOrganizationIds?: number[] },
 ): Promise<void> {
   // Deletions follow similar rules as creation:
   //  - Global admins can delete any invitation
@@ -181,22 +267,19 @@ async function organizationInvitationDeletionAuthorizer(
   }
 
   const invitation = await db.organizationInvitation.findUnique({
-    where: { id: requestParams.id },
+    where: { id: enrichedParams.id },
+    select: {
+      organizationId: true,
+    },
   });
 
   if (!invitation) {
     throw new Error("Invitation not found");
   }
 
-  const userOrganization = await db.userOrganization.findFirst({
-    where: {
-      userId: parseInt(securityContext.currentUserId),
-      organizationId: invitation.organizationId,
-      isAdmin: true,
-    },
-  });
-
-  if (!userOrganization) {
+  // Check if user is admin of the invitation's organization
+  const adminOrganizationIds = enrichedParams.adminOrganizationIds || [];
+  if (!adminOrganizationIds.includes(invitation.organizationId)) {
     throw new Error("Admin access required for this organization");
   }
 }

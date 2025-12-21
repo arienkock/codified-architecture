@@ -54,7 +54,7 @@ export interface PostCreateHook {
 }
 
 export interface ReferenceDataLoader {
-    (db: PrismaClient, requestParams: any): Promise<Record<string, any>>
+    (db: PrismaClient, requestParams: any, securityContext: SecurityContext): Promise<Record<string, any>>
 }
 
 export const IdPathParamSchema = z.object({ id: z.coerce.number().int() });
