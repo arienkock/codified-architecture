@@ -14,7 +14,7 @@ const internalFields: Record<string, true> = {
 };
 
 const organizationInvitationResourceDefinition: ResourceDefinition = {
-  name: "invitation",
+  name: "organizationInvitation",
   namePlural: "invitations",
   create: {
     requestBodySchema: OrganizationInvitationCreateInputSchema.omit({
