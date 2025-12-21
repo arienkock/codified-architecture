@@ -145,13 +145,29 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
             let securityFilter: any;
             try {
                 requestParams = readOp.requestParamsSchema.parse({ ...req.query, ...req.params });
+                // Fetch current organization ID for the user if authenticated
+                let enhancedSecurityContext = { ...req.securityContext };
+                if (req.securityContext.currentUserId && !req.securityContext.isAdmin) {
+                    const currentOrg = await db.userOrganization.findFirst({
+                        where: {
+                            userId: parseInt(req.securityContext.currentUserId),
+                            isCurrent: true,
+                        },
+                        select: {
+                            organizationId: true,
+                        },
+                    });
+                    if (currentOrg) {
+                        enhancedSecurityContext.currentOrganizationId = currentOrg.organizationId;
+                    }
+                }
                 let enrichedParams = requestParams;
                 if (readOp.referenceDataLoader) {
-                    const referenceData = await readOp.referenceDataLoader(db, requestParams, req.securityContext);
+                    const referenceData = await readOp.referenceDataLoader(db, requestParams, enhancedSecurityContext);
                     enrichedParams = { ...requestParams, ...referenceData };
                 }
-                await Promise.all(readOp.authorizers.map((authorizer) => authorizer(req.securityContext, db, enrichedParams)));
-                securityFilter = readOp.securityFilterGenerator(req.securityContext, enrichedParams);
+                await Promise.all(readOp.authorizers.map((authorizer) => authorizer(enhancedSecurityContext, db, enrichedParams)));
+                securityFilter = readOp.securityFilterGenerator(enhancedSecurityContext, enrichedParams);
             } catch (error) {
                 if (error instanceof Error && error.message.includes('required')) {
                     return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);

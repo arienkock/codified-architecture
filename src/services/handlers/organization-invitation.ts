@@ -85,15 +85,42 @@ function securityFilterGenerator(
   const adminOrganizationIds = enrichedParams.adminOrganizationIds || [];
   const userId = parseInt(securityContext.currentUserId);
 
-  // Build OR conditions: user's own invitations OR invitations for orgs where user is admin
-  const conditions: any[] = [
-    { userId },
-  ];
+  // Build OR conditions:
+  // - Org admins: invitations for orgs where user is admin (any user in those orgs)
+  // - Regular users: only their own invitations in their current org
+  const conditions: any[] = [];
 
+  // Org admins can see all invitations for orgs they admin
   if (adminOrganizationIds.length > 0) {
     conditions.push({
       organizationId: { in: adminOrganizationIds },
     });
+  }
+
+  // Regular users can only see invitations for themselves in their current org
+  // Only add this condition if user is NOT an org admin (to avoid restricting org admins)
+  if (adminOrganizationIds.length === 0 && securityContext.currentOrganizationId) {
+    conditions.push({
+      userId,
+      organizationId: securityContext.currentOrganizationId,
+    });
+  } else if (adminOrganizationIds.length === 0) {
+    // If no current org and not an org admin, regular users can still see their own invitations (fallback)
+    conditions.push({
+      userId,
+    });
+  }
+
+  // If no conditions, return filter that matches nothing
+  if (conditions.length === 0) {
+    return {
+      id: -1,
+    };
+  }
+
+  // If only one condition, return it directly (more efficient and clearer)
+  if (conditions.length === 1) {
+    return conditions[0];
   }
 
   return {
@@ -140,7 +167,7 @@ function authenticationRequiredAuthorizer(
 async function organizationInvitationReadAuthorizer(
   securityContext: SecurityContext,
   db: PrismaClient,
-  enrichedParams: { id: number; adminOrganizationIds?: number[] },
+  enrichedParams: { id?: number; adminOrganizationIds?: number[] },
 ): Promise<void> {
   // Global admins can read any invitation
   if (securityContext.isAdmin) {
@@ -149,6 +176,11 @@ async function organizationInvitationReadAuthorizer(
 
   if (!securityContext.currentUserId) {
     throw new Error("Authentication required");
+  }
+
+  // For collection endpoints (no id), the security filter handles authorization
+  if (!enrichedParams.id) {
+    return;
   }
 
   const invitation = await db.organizationInvitation.findUnique({
@@ -164,14 +196,23 @@ async function organizationInvitationReadAuthorizer(
     return;
   }
 
-  // Allow the invited user to read their own invitation
-  if (invitation.userId === parseInt(securityContext.currentUserId)) {
-    return;
-  }
-
   // Check if user is admin of the invitation's organization
   const adminOrganizationIds = enrichedParams.adminOrganizationIds || [];
   if (adminOrganizationIds.includes(invitation.organizationId)) {
+    return;
+  }
+
+  // Regular users can only read invitations for themselves in their current org
+  if (invitation.userId === parseInt(securityContext.currentUserId)) {
+    // If they have a current org, the invitation must be in that org
+    if (securityContext.currentOrganizationId) {
+      if (invitation.organizationId === securityContext.currentOrganizationId) {
+        return;
+      }
+      // Invitation is for user but not in their current org - reject
+      throw new Error("Not allowed to read this invitation");
+    }
+    // If no current org set, still allow reading own invitations (fallback)
     return;
   }
 
