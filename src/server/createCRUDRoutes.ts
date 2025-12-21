@@ -13,8 +13,13 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
     if (resourceDefinition.read) {
         const readOp = resourceDefinition.read;
         router.get("/", async (req, res) => {
+            let enrichedParams: any = {};
+            if (readOp.referenceDataLoader) {
+                const referenceData = await readOp.referenceDataLoader(db, {});
+                enrichedParams = { ...enrichedParams, ...referenceData };
+            }
             try {
-                await Promise.all(readOp.authorizers.map((authorizer) => authorizer(req.securityContext, db, {})));
+                await Promise.all(readOp.authorizers.map((authorizer) => authorizer(req.securityContext, db, enrichedParams)));
             } catch (error) {
                 if (error instanceof Error && error.message.includes('required')) {
                     return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);
@@ -41,7 +46,7 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
                         enhancedSecurityContext.currentOrganizationId = currentOrg.organizationId;
                     }
                 }
-                where = readOp.securityFilterGenerator(enhancedSecurityContext, {} as any);
+                where = readOp.securityFilterGenerator(enhancedSecurityContext, enrichedParams);
             } catch (error) {
                 if (error instanceof z.ZodError) {
                     return res.status(400).json({ message: "Invalid request", errors: error.issues } satisfies GenericErrorResponse);
@@ -91,8 +96,13 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
                 }
                 return res.status(400).json({ message: "Invalid request" } satisfies GenericErrorResponse);
             }
+            let enrichedParams: any = body;
+            if (createOp.referenceDataLoader) {
+                const referenceData = await createOp.referenceDataLoader(db, body);
+                enrichedParams = { ...referenceData };
+            }
             try {
-                await Promise.all(createOp.authorizers.map((authorizer) => authorizer(req.securityContext, db, body)));
+                await Promise.all(createOp.authorizers.map((authorizer) => authorizer(req.securityContext, db, enrichedParams)));
             } catch (error) {
                 if (error instanceof Error && error.message.includes('required')) {
                     return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);
@@ -135,20 +145,21 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
             let securityFilter: any;
             try {
                 requestParams = readOp.requestParamsSchema.parse({ ...req.query, ...req.params });
-                await Promise.all(readOp.authorizers.map((authorizer) => authorizer(req.securityContext, db, requestParams)));
+                let enrichedParams = requestParams;
+                if (readOp.referenceDataLoader) {
+                    const referenceData = await readOp.referenceDataLoader(db, requestParams);
+                    enrichedParams = { ...requestParams, ...referenceData };
+                }
+                await Promise.all(readOp.authorizers.map((authorizer) => authorizer(req.securityContext, db, enrichedParams)));
+                securityFilter = readOp.securityFilterGenerator(req.securityContext, enrichedParams);
             } catch (error) {
                 if (error instanceof Error && error.message.includes('required')) {
                     return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);
                 }
-                return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);
-            }
-            try {
-                securityFilter = readOp.securityFilterGenerator(req.securityContext, requestParams);
-            } catch (error) {
                 if (error instanceof z.ZodError) {
                     return res.status(400).json({ message: "Invalid request", errors: error.issues } satisfies GenericErrorResponse);
                 }
-                return res.status(400).json({ message: "Invalid request" } satisfies GenericErrorResponse);
+                return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);
             }
             repo.findMany({
                 where: {
@@ -180,24 +191,22 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
             let securityFilter: any;
             try {
                 requestParams = updateOp.requestParamsSchema.parse({ ...req.query, ...req.params });
-                await Promise.all(updateOp.authorizers.map((authorizer) => authorizer(req.securityContext, db, requestParams)));
+                let enrichedParams = requestParams;
+                if (updateOp.referenceDataLoader) {
+                    const referenceData = await updateOp.referenceDataLoader(db, requestParams);
+                    enrichedParams = { ...requestParams, ...referenceData };
+                }
+                await Promise.all(updateOp.authorizers.map((authorizer) => authorizer(req.securityContext, db, enrichedParams)));
+                securityFilter = updateOp.securityFilterGenerator(req.securityContext, enrichedParams);
+                data = updateOp.requestBodySchema.parse(req.body);
             } catch (error) {
                 if (error instanceof Error && error.message.includes('required')) {
                     return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);
                 }
-                return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);
-            }
-            try {
-                securityFilter = updateOp.securityFilterGenerator(req.securityContext, {} as any);
-                data = updateOp.requestBodySchema.parse(req.body);
-            } catch (error) {
                 if (error instanceof z.ZodError) {
                     return res.status(400).json({ message: "Invalid request", errors: error.issues } satisfies GenericErrorResponse);
                 }
-                if (error instanceof Error && error.message.includes('required')) {
-                    return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);
-                }
-                return res.status(400).json({ message: "Invalid request" } satisfies GenericErrorResponse);
+                return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);
             }
             repo.updateManyAndReturn({
                 data: data as any,
@@ -233,20 +242,21 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
             let securityFilter: any;
             try {
                 requestParams = deleteOp.requestParamsSchema.parse({ ...req.query, ...req.params });
-                await Promise.all(deleteOp.authorizers.map((authorizer) => authorizer(req.securityContext, db, requestParams)));
+                let enrichedParams = requestParams;
+                if (deleteOp.referenceDataLoader) {
+                    const referenceData = await deleteOp.referenceDataLoader(db, requestParams);
+                    enrichedParams = { ...requestParams, ...referenceData };
+                }
+                await Promise.all(deleteOp.authorizers.map((authorizer) => authorizer(req.securityContext, db, enrichedParams)));
+                securityFilter = deleteOp.securityFilterGenerator(req.securityContext, enrichedParams);
             } catch (error) {
                 if (error instanceof Error && error.message.includes('required')) {
                     return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);
                 }
-                return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);
-            }
-            try {
-                securityFilter = deleteOp.securityFilterGenerator(req.securityContext, {} as any);
-            } catch (error) {
                 if (error instanceof z.ZodError) {
                     return res.status(400).json({ message: "Invalid request", errors: error.issues } satisfies GenericErrorResponse);
                 }
-                return res.status(400).json({ message: "Invalid request" } satisfies GenericErrorResponse);
+                return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);
             }
             repo.deleteMany({
                 where: {

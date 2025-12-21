@@ -11,12 +11,14 @@ export interface ResourceDefinition {
         validators: Validator[];
         authorizers: Authorizer[];
         postCreateHook?: PostCreateHook;
+        referenceDataLoader?: ReferenceDataLoader;
     };
     read?: {
         requestParamsSchema: z.ZodSchema;
         responseSchema: z.ZodSchema;
         securityFilterGenerator: SecurityFilterGenerator;
         authorizers: Authorizer[];
+        referenceDataLoader?: ReferenceDataLoader;
     };
     update?: {
         requestBodySchema: z.ZodSchema;
@@ -24,12 +26,14 @@ export interface ResourceDefinition {
         securityFilterGenerator: SecurityFilterGenerator;
         validators: Validator[];
         authorizers: Authorizer[];
+        referenceDataLoader?: ReferenceDataLoader;
     };
     delete?: {
         authorizers: Authorizer[];
         requestParamsSchema: z.ZodSchema;
         securityFilterGenerator: SecurityFilterGenerator;
         validators: Validator[];
+        referenceDataLoader?: ReferenceDataLoader;
     };
 }
 
@@ -47,6 +51,10 @@ export interface Transformer {
 
 export interface PostCreateHook {
     (createdEntity: any, db: PrismaClient, securityContext: SecurityContext): Promise<void>
+}
+
+export interface ReferenceDataLoader {
+    (db: PrismaClient, requestParams: any): Promise<Record<string, any>>
 }
 
 export const IdPathParamSchema = z.object({ id: z.coerce.number().int() });
