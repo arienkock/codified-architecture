@@ -622,6 +622,12 @@ describe('Invitation API - read (get many & get one)', () => {
       .send({ email: 'inv-read-single-regular-other@example.com', name: 'Regular User', password: 'supersafe123' })
       .set('content-type', 'application/json');
 
+    // Unset current flag on any existing orgs (e.g., personal org created automatically)
+    await db.userOrganization.updateMany({
+      where: { userId: regularUser.body.id },
+      data: { isCurrent: false },
+    });
+
     // Add regular user as member of org1 (current org) and org2 (not current)
     await db.userOrganization.create({
       data: {

@@ -188,7 +188,7 @@ describe('Organization API - read (get many & get one)', () => {
       .set('content-type', 'application/json');
 
     const res = await agent
-      .get(`${baseUrl}/organizations`)
+      .get(`${baseUrl}/organizations?pageSize=1000`)
       .set('content-type', 'application/json');
 
     expect(res.status).toBe(200);

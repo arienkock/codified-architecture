@@ -106,9 +106,8 @@ declare module 'express-serve-static-core' {
 // TODO: Use cookie parser to use signed cookies.
 async function securityContextMiddleware(req: express.Request, res: express.Response, next: express.NextFunction) {
     const securityContext = await parseSessionCookie(req.cookies?.session ?? '');
-    if (!!securityContext) {
-        req.securityContext = securityContext;
-    }
+    // Always set a security context, even for unauthenticated requests
+    req.securityContext = securityContext ?? { currentUserId: undefined, isAdmin: false };
     return next();
 }
 

@@ -87,7 +87,7 @@ function securityFilterGenerator(
 
   // Build OR conditions:
   // - Org admins: invitations for orgs where user is admin (any user in those orgs)
-  // - Regular users: only their own invitations in their current org
+  // - All users: their own invitations in their current org
   const conditions: any[] = [];
 
   // Org admins can see all invitations for orgs they admin
@@ -97,15 +97,15 @@ function securityFilterGenerator(
     });
   }
 
-  // Regular users can only see invitations for themselves in their current org
-  // Only add this condition if user is NOT an org admin (to avoid restricting org admins)
-  if (adminOrganizationIds.length === 0 && securityContext.currentOrganizationId) {
+  // All users can see their own invitations in their current org
+  // (This applies even if they're an org admin of other orgs)
+  if (securityContext.currentOrganizationId) {
     conditions.push({
       userId,
       organizationId: securityContext.currentOrganizationId,
     });
-  } else if (adminOrganizationIds.length === 0) {
-    // If no current org and not an org admin, regular users can still see their own invitations (fallback)
+  } else {
+    // If no current org set, allow seeing own invitations as fallback
     conditions.push({
       userId,
     });
