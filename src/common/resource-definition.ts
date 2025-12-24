@@ -5,6 +5,7 @@ import { PrismaClient } from "../persistence/generated/prisma";
 export interface ResourceDefinition {
     name: string;
     namePlural: string;
+    isSynthetic?: boolean; // If true, skip database entity creation
     create?: {
         requestBodySchema: z.ZodSchema;
         requestBodyTransformer?: Transformer;
@@ -50,7 +51,7 @@ export interface Transformer {
 }
 
 export interface PostCreateHook {
-    (createdEntity: any, db: PrismaClient, securityContext: SecurityContext): Promise<void>
+    (createdEntity: any, db: PrismaClient, securityContext: SecurityContext, res?: any): Promise<void>
 }
 
 export interface ReferenceDataLoader {

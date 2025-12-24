@@ -87,7 +87,7 @@ function authenticationRequiredAuthorizer(securityContext: SecurityContext, db: 
     return Promise.resolve();
 }
 
-async function createPersonalOrganization(createdUser: any, db: PrismaClient, securityContext: SecurityContext): Promise<void> {
+async function createPersonalOrganization(createdUser: any, db: PrismaClient, securityContext: SecurityContext, res?: any): Promise<void> {
     const organizationName = createdUser.name ? `${createdUser.name}'s Personal` : 'Personal';
     const organization = await db.organization.create({
         data: {

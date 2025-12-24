@@ -112,6 +112,23 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
             if (createOp.requestBodyTransformer) {
                 body = createOp.requestBodyTransformer(body);
             }
+            // Handle synthetic resources (no database entity creation)
+            if (resourceDefinition.isSynthetic) {
+                try {
+                    if (createOp.postCreateHook) {
+                        // For synthetic resources, pass the request body as the "created entity"
+                        await createOp.postCreateHook(body, db, req.securityContext, res);
+                    }
+                    // For synthetic resources, return success response
+                    return res.json({ message: "Success" });
+                } catch (error: any) {
+                    console.log(error);
+                    if (error.statusCode) {
+                        return res.status(error.statusCode).json({ message: error.message } satisfies GenericErrorResponse);
+                    }
+                    return res.status(500).json({ message: "Internal server error" } satisfies GenericErrorResponse);
+                }
+            }
             return db.$transaction(async (tx) => {
                 const modelName = resourceDefinition.name.charAt(0).toLowerCase() + resourceDefinition.name.slice(1);
                 const txRepo = (tx as any)[modelName];
@@ -119,7 +136,7 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
                     data: body as any,
                 });
                 if (createOp.postCreateHook) {
-                    await createOp.postCreateHook(created, tx as PrismaClient, req.securityContext);
+                    await createOp.postCreateHook(created, tx as PrismaClient, req.securityContext, res);
                 }
                 return created;
             })

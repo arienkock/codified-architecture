@@ -117,7 +117,7 @@ async function organizationAdministrationAuthorizer(
     return Promise.resolve();
 }
 
-async function addCreatorAsAdmin(createdOrganization: any, db: any, securityContext: SecurityContext): Promise<void> {
+async function addCreatorAsAdmin(createdOrganization: any, db: any, securityContext: SecurityContext, res?: any): Promise<void> {
     if (!securityContext.currentUserId) {
         throw new Error('Authentication required');
     }

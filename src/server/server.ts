@@ -4,8 +4,10 @@ import { PrismaClient } from "../persistence/generated/prisma/client.js";
 import userResourceDefinition from "../services/handlers/user.js";
 import organizationResourceDefinition from "../services/handlers/organization.js";
 import organizationInvitationResourceDefinition from "../services/handlers/organization-invitation.js";
+import loginResourceDefinition from "../services/handlers/login.js";
 import { createCRUDRoutes } from "./createCRUDRoutes.js";
 import { SecurityContext } from "../common/security.js";
+import { createSessionCookie } from "../common/session.js";
 import * as jose from 'jose'
 import cookieParser from "cookie-parser";
 import { rateLimitMiddleware } from "./rateLimitMiddleware.js";
@@ -88,13 +90,11 @@ function setupRoutes(app: express.Application, db: PrismaClient, config: AppConf
     app.use(`/${userResourceDefinition.namePlural}`, createCRUDRoutes(db, db.user, userResourceDefinition, config));
     app.use(`/${organizationResourceDefinition.namePlural}`, createCRUDRoutes(db, db.organization, organizationResourceDefinition, config));
     app.use(`/${organizationInvitationResourceDefinition.namePlural}`, createCRUDRoutes(db, db.organizationInvitation, organizationInvitationResourceDefinition, config));
+    app.use(`/${loginResourceDefinition.namePlural}`, createCRUDRoutes(db, null as any, loginResourceDefinition, config));
 }
 
 async function initSesssionCookieForUser(res: express.Response, user: SecurityContext) {
-    const secret = new TextEncoder().encode(
-        defaultConfig.JWT_SECRET
-    );
-    res.cookie('session', await new jose.SignJWT(user as any).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().setExpirationTime('1h').sign(secret), { httpOnly: true, secure: false });
+    await createSessionCookie(res, user);
 }
 
 declare module 'express-serve-static-core' {
