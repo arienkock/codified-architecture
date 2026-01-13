@@ -21,7 +21,6 @@ const userResourceDefinition: ResourceDefinition = {
         postCreateHook: createPersonalOrganization,
     },
     read: {
-        requestParamsSchema: IdPathParamSchema,
         responseSchema: UserResultSchema.omit(internalFields),
         securityFilterGenerator: securityFilterGenerator,
         authorizers: [
@@ -31,7 +30,6 @@ const userResourceDefinition: ResourceDefinition = {
     update: {
         requestBodySchema: UserUpdateInputSchema.omit(internalFields).extend({ password: z.string() }).strict().partial(),
         requestBodyTransformer: hashPasswordTransformer,
-        requestParamsSchema: IdPathParamSchema,
         securityFilterGenerator: securityFilterGenerator,
         validators: [],
         authorizers: [
@@ -42,7 +40,6 @@ const userResourceDefinition: ResourceDefinition = {
         authorizers: [
             authenticationRequiredAuthorizer,
         ],
-        requestParamsSchema: IdPathParamSchema,
         securityFilterGenerator: securityFilterGenerator,
         validators: [],
     },
@@ -59,8 +56,7 @@ function hashPasswordTransformer(input: any): z.infer<typeof UserCreateInputSche
     return result;
 }
 
-const readRequestParamsSchema = userResourceDefinition.read!.requestParamsSchema;
-function securityFilterGenerator(securityContext: SecurityContext, requestParams: z.infer<typeof readRequestParamsSchema>): any {
+function securityFilterGenerator(securityContext: SecurityContext, requestParams: z.infer<typeof IdPathParamSchema>): any {
     if (securityContext.isAdmin) {
         return {};
     }

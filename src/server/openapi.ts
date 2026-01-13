@@ -2,6 +2,7 @@ import z from "zod";
 import { createDocument, ZodOpenApiOperationObject, ZodOpenApiPathItemObject } from "zod-openapi";
 import { ResourceDefinition } from "../common/resource-definition.js";
 import { createPaginatedResponseSchema, paginationParamsSchema } from "../common/pagination.js";
+import { getRequestParamsSchema } from "./createCRUDRoutes.js";
 
 import userResourceDefinition from "../services/handlers/user.js";
 import organizationResourceDefinition from "../services/handlers/organization.js";
@@ -53,7 +54,7 @@ function ReadResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiOpe
     return {
         summary: `Get a ${resourceDefinition.name} by ID`,
         requestParams: {
-            path: resourceDefinition.read!.requestParamsSchema as z.ZodObject<any>,
+            path: getRequestParamsSchema(resourceDefinition.read?.requestParamsSchema) as z.ZodObject<any>,
         },
         responses: {
             200: {
@@ -72,7 +73,7 @@ function UpdateResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiO
     return {
         summary: `Update a ${resourceDefinition.name} by ID`,
         requestParams: {
-            path: resourceDefinition.update!.requestParamsSchema as z.ZodObject<any>,
+            path: getRequestParamsSchema(resourceDefinition.update?.requestParamsSchema) as z.ZodObject<any>,
         },
         requestBody: {
             content: {
@@ -98,7 +99,7 @@ function DeleteResourcePath(resourceDefinition: ResourceDefinition): ZodOpenApiO
     return {
         summary: `Delete a ${resourceDefinition.name} by ID`,
         requestParams: {
-            path: resourceDefinition.delete!.requestParamsSchema as z.ZodObject<any>,
+            path: getRequestParamsSchema(resourceDefinition.delete?.requestParamsSchema) as z.ZodObject<any>,
         },
         responses: {
             200: {

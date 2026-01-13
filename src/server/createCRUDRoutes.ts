@@ -1,10 +1,27 @@
 import express from "express";
 import z from "zod";
 import { paginationParamsSchema, PaginatedResponse } from "../common/pagination";
-import { ResourceDefinition } from "../common/resource-definition";
+import { ResourceDefinition, IdPathParamSchema } from "../common/resource-definition";
 import { AppConfig } from "../config.js";
 import { PrismaClient } from "../persistence/generated/prisma";
 import { GenericErrorResponse } from "../common/errors";
+
+/**
+ * Gets the request params schema, defaulting to IdPathParamSchema and merging with custom schema if provided.
+ * This ensures the 'id' field is always present, while allowing resource definitions to extend with additional params.
+ */
+export function getRequestParamsSchema(customSchema?: z.ZodSchema): z.ZodSchema {
+    if (!customSchema) {
+        return IdPathParamSchema;
+    }
+    // If custom schema is provided, extend IdPathParamSchema with the custom schema's shape
+    // This ensures 'id' is always present, and the custom schema's definition for 'id' will take precedence if it exists
+    if (customSchema instanceof z.ZodObject) {
+        return IdPathParamSchema.extend(customSchema.shape);
+    }
+    // Custom request params schemas must be object schemas to be merged with IdPathParamSchema
+    throw new Error(`requestParamsSchema must be a ZodObject, but got ${customSchema.constructor.name}`);
+}
 
 export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition: ResourceDefinition, config: AppConfig) {
     const router = express.Router();
@@ -161,7 +178,8 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
             let requestParams: any;
             let securityFilter: any;
             try {
-                requestParams = readOp.requestParamsSchema.parse({ ...req.query, ...req.params });
+                const requestParamsSchema = getRequestParamsSchema(readOp.requestParamsSchema);
+                requestParams = requestParamsSchema.parse({ ...req.query, ...req.params });
                 // Fetch current organization ID for the user if authenticated
                 let enhancedSecurityContext = { ...req.securityContext };
                 if (req.securityContext.currentUserId && !req.securityContext.isAdmin) {
@@ -223,7 +241,8 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
             let requestParams: any;
             let securityFilter: any;
             try {
-                requestParams = updateOp.requestParamsSchema.parse({ ...req.query, ...req.params });
+                const requestParamsSchema = getRequestParamsSchema(updateOp.requestParamsSchema);
+                requestParams = requestParamsSchema.parse({ ...req.query, ...req.params });
                 let enrichedParams = requestParams;
                 if (updateOp.referenceDataLoader) {
                     const referenceData = await updateOp.referenceDataLoader(db, requestParams, req.securityContext);
@@ -277,7 +296,8 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
             let requestParams: any;
             let securityFilter: any;
             try {
-                requestParams = deleteOp.requestParamsSchema.parse({ ...req.query, ...req.params });
+                const requestParamsSchema = getRequestParamsSchema(deleteOp.requestParamsSchema);
+                requestParams = requestParamsSchema.parse({ ...req.query, ...req.params });
                 let enrichedParams = requestParams;
                 if (deleteOp.referenceDataLoader) {
                     const referenceData = await deleteOp.referenceDataLoader(db, requestParams, req.securityContext);

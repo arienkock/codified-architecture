@@ -1,5 +1,5 @@
 import z from "zod";
-import { IdPathParamSchema, ResourceDefinition } from "../../common/resource-definition";
+import { ResourceDefinition } from "../../common/resource-definition";
 import {
   OrganizationInvitationCreateInputSchema,
   OrganizationInvitationResultSchema,
@@ -29,7 +29,6 @@ const organizationInvitationResourceDefinition: ResourceDefinition = {
     ],
   },
   read: {
-    requestParamsSchema: IdPathParamSchema,
     responseSchema: OrganizationInvitationResultSchema.omit(internalFields),
     securityFilterGenerator,
     referenceDataLoader: loadAdminOrganizationIds,
@@ -43,7 +42,6 @@ const organizationInvitationResourceDefinition: ResourceDefinition = {
     requestBodySchema: z.object({
       accepted: OrganizationInvitationUpdateInputSchema.shape.accepted,
     }).strict(),
-    requestParamsSchema: IdPathParamSchema,
     securityFilterGenerator,
     referenceDataLoader: loadAdminOrganizationIds,
     validators: [],
@@ -57,7 +55,6 @@ const organizationInvitationResourceDefinition: ResourceDefinition = {
       authenticationRequiredAuthorizer,
       organizationInvitationDeletionAuthorizer,
     ],
-    requestParamsSchema: IdPathParamSchema,
     securityFilterGenerator,
     referenceDataLoader: loadAdminOrganizationIds,
     validators: [],
@@ -66,7 +63,6 @@ const organizationInvitationResourceDefinition: ResourceDefinition = {
 
 export default organizationInvitationResourceDefinition;
 
-const readRequestParamsSchema = organizationInvitationResourceDefinition.read!.requestParamsSchema;
 function securityFilterGenerator(
   securityContext: SecurityContext,
   enrichedParams: any,

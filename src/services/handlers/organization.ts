@@ -21,7 +21,6 @@ const organizationResourceDefinition: ResourceDefinition = {
         postCreateHook: addCreatorAsAdmin,
     },
     read: {
-        requestParamsSchema: IdPathParamSchema,
         responseSchema: OrganizationResultSchema.omit(internalFields),
         securityFilterGenerator: securityFilterGenerator,
         authorizers: [
@@ -30,7 +29,6 @@ const organizationResourceDefinition: ResourceDefinition = {
     },
     update: {
         requestBodySchema: OrganizationUpdateInputSchema.omit(internalFields).strict().partial(),
-        requestParamsSchema: IdPathParamSchema,
         securityFilterGenerator: securityFilterGenerator,
         validators: [],
         authorizers: [
@@ -43,7 +41,6 @@ const organizationResourceDefinition: ResourceDefinition = {
             authenticationRequiredAuthorizer,
             organizationAdministrationAuthorizer,
         ],
-        requestParamsSchema: IdPathParamSchema,
         securityFilterGenerator: securityFilterGenerator,
         validators: [],
     },
@@ -51,8 +48,7 @@ const organizationResourceDefinition: ResourceDefinition = {
 
 export default organizationResourceDefinition;
 
-const readRequestParamsSchema = organizationResourceDefinition.read!.requestParamsSchema;
-function securityFilterGenerator(securityContext: SecurityContext, requestParams: z.infer<typeof readRequestParamsSchema>): any {
+function securityFilterGenerator(securityContext: SecurityContext, requestParams: z.infer<typeof IdPathParamSchema>): any {
     if (securityContext.isAdmin) {
         return {};
     }

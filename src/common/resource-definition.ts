@@ -15,7 +15,7 @@ export interface ResourceDefinition {
         referenceDataLoader?: ReferenceDataLoader;
     };
     read?: {
-        requestParamsSchema: z.ZodSchema;
+        requestParamsSchema?: z.ZodSchema;
         responseSchema: z.ZodSchema;
         securityFilterGenerator: SecurityFilterGenerator;
         authorizers: Authorizer[];
@@ -24,7 +24,7 @@ export interface ResourceDefinition {
     update?: {
         requestBodySchema: z.ZodSchema;
         requestBodyTransformer?: Transformer;
-        requestParamsSchema: z.ZodSchema;
+        requestParamsSchema?: z.ZodSchema;
         securityFilterGenerator: SecurityFilterGenerator;
         validators: Validator[];
         authorizers: Authorizer[];
@@ -32,7 +32,7 @@ export interface ResourceDefinition {
     };
     delete?: {
         authorizers: Authorizer[];
-        requestParamsSchema: z.ZodSchema;
+        requestParamsSchema?: z.ZodSchema;
         securityFilterGenerator: SecurityFilterGenerator;
         validators: Validator[];
         referenceDataLoader?: ReferenceDataLoader;
