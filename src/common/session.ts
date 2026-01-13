@@ -18,3 +18,4 @@ export async function createSessionCookie(res: express.Response, securityContext
     res.cookie('session', sessionCookie, { httpOnly: true, secure: false });
 }
 
+
