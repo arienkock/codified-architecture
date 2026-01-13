@@ -270,6 +270,64 @@ describe('User API', () => {
     expect(updated.body.errors).toBeDefined();
   });
 
+  it('updates user password successfully', async () => {
+    const agent = request.agent();
+    const email = 'api-user-password-update@example.com';
+    const name = 'API User Password Update';
+    const originalPassword = 'original123';
+    const newPassword = 'newpassword456';
+    
+    // Create a user with initial password
+    const user = await agent
+      .post(`${baseUrl}/users`)
+      .send({ email, name, password: originalPassword })
+      .set('content-type', 'application/json');
+    
+    expect(user.status).toBe(200);
+    const userId = user.body.id;
+    
+    // Verify login works with original password
+    const loginAgent = request.agent();
+    const originalLoginRes = await loginAgent
+      .post(`${baseUrl}/logins`)
+      .send({ email, password: originalPassword })
+      .set('content-type', 'application/json');
+    
+    expect(originalLoginRes.status).toBe(200);
+    
+    // Update the user's password (as admin)
+    await agent
+      .get(`${baseUrl}/dev/loginAsUser?userId=1&isAdmin=true`)
+      .set('content-type', 'application/json');
+    
+    const updateRes = await agent
+      .put(`${baseUrl}/users/${userId}`)
+      .send({ password: newPassword })
+      .set('content-type', 'application/json');
+    
+    // The update should succeed
+    expect(updateRes.status).toBe(200);
+    
+    // Try to login with the new password - this should work
+    const newLoginAgent = request.agent();
+    const newLoginRes = await newLoginAgent
+      .post(`${baseUrl}/logins`)
+      .send({ email, password: newPassword })
+      .set('content-type', 'application/json');
+    
+    expect(newLoginRes.status).toBe(200);
+    
+    // Verify the original password no longer works
+    const originalLoginRes2 = await loginAgent
+      .post(`${baseUrl}/logins`)
+      .ok(res => res.status === 401)
+      .send({ email, password: originalPassword })
+      .set('content-type', 'application/json');
+    
+    expect(originalLoginRes2.status).toBe(401);
+    expect(originalLoginRes2.body.message).toBe('Invalid email or password');
+  });
+
   it('should support pagination', async () => {
     // Create users until there are at least 10
     const agent = request.agent();

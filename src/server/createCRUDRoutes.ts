@@ -241,6 +241,9 @@ export function createCRUDRoutes(db: PrismaClient, repo: any, resourceDefinition
                 }
                 return res.status(401).json({ message: "Unauthorized" } satisfies GenericErrorResponse);
             }
+            if (updateOp.requestBodyTransformer) {
+                data = updateOp.requestBodyTransformer(data);
+            }
             repo.updateManyAndReturn({
                 data: data as any,
                 where: {

@@ -30,6 +30,7 @@ const userResourceDefinition: ResourceDefinition = {
     },
     update: {
         requestBodySchema: UserUpdateInputSchema.omit(internalFields).extend({ password: z.string() }).strict().partial(),
+        requestBodyTransformer: hashPasswordTransformer,
         requestParamsSchema: IdPathParamSchema,
         securityFilterGenerator: securityFilterGenerator,
         validators: [],
@@ -50,11 +51,11 @@ const userResourceDefinition: ResourceDefinition = {
 export default userResourceDefinition;
 
 function hashPasswordTransformer(input: any): z.infer<typeof UserCreateInputSchema> {
-    const result = {
-        ...input,
-        hashedPassword: bcrypt.hashSync(input.password, 10),
-    };
-    delete result.password;
+    const result = { ...input };
+    if (input.password) {
+        result.hashedPassword = bcrypt.hashSync(input.password, 10);
+        delete result.password;
+    }
     return result;
 }
 

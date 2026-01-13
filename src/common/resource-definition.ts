@@ -23,6 +23,7 @@ export interface ResourceDefinition {
     };
     update?: {
         requestBodySchema: z.ZodSchema;
+        requestBodyTransformer?: Transformer;
         requestParamsSchema: z.ZodSchema;
         securityFilterGenerator: SecurityFilterGenerator;
         validators: Validator[];
